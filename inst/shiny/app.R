@@ -1,6 +1,6 @@
 # Model Visualization Platform -------------------------------------------------
 #
-# Authors: Steve Choy (2023-2025), Jin Gyu Kim (2023)
+# Authors: Steve Choy (2023-2026), Jin Gyu Kim (2023)
 #
 #
 #-------------------------------------------------------------------------------
@@ -2334,6 +2334,7 @@ ui <- shiny::navbarPage(
                                title = 'Changelog', status = 'primary', solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE,
                                p('Please visit the ', a(href = "https://github.com/stevechoy/MVPapp/releases", "Github release page", target = "_blank"), ' for more information.'),
                                htmltools::br(),
+                               p('v0.3.5 (2026-02-04) - Dose info now displays correctly for all doses in Individual Plots'),
                                p('v0.3.4 (2025-12-02) - Covariate histograms feature in Data Exploration.'),
                                p('v0.3.3 (2025-07-31) - NHANES updated to include 2021-2023. BMI filter for external databases. Minor bug fixes.'),
                                p('v0.3.2 (2025-06-13) - Added spider plots sub-tab for batch runs.'),

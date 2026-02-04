@@ -543,8 +543,8 @@ do_data_page_plot <- function(nmd,
 #' @param pagenum Page number to filter by
 #' @param filter_id Filter by these IDs
 #' @param filter_cmt Filter by this CMT
-#' @param sort_by Sort by one or more variables (a list)
-#' @param strat_by Stratify by 1 variable and highlight outliers
+#' @param sort_by Sort by one or more variables (a list), default NULL
+#' @param strat_by Stratify by 1 variable and highlight outliers, default ''
 #' @param highlight_range Flag potential outliers when they are higher or below this mean value of the group, a string
 #' @param x_axis X-axis for plot
 #' @param y_axis Y-axis for plot
@@ -624,22 +624,26 @@ do_data_page_ind_plot <- function(nmd,
   if(debug) {
     message(paste0("Creating data_page_ind_plot"))
   }
-
+  
   nmd <- nmd %>% dplyr::ungroup() # Safeguard to always ungroup() the data
-
+  
   if(filter_cmt != 'NULL') {
-    nmd <- nmd %>% dplyr::filter(CMT %in% filter_cmt)
+    if(plot_dosing && 'EVID' %in% names(nmd) & !boxplot & dose_col != "") {
+      nmd <- nmd %>% dplyr::filter(CMT %in% filter_cmt | EVID == 1 | EVID == 4) # Remember to keep doses in at this stage of the filtering
+    } else {
+      nmd <- nmd %>% dplyr::filter(CMT %in% filter_cmt)
+    }
   }
-
+  
   # Check if any columns are selected for sorting, otherwise uses ID as default
   if (length(sort_by) > 0) {
     # Dynamically create the labeling column (facet_label) based on sort_by
     nmd <- create_facet_label(df = nmd, sort_by = sort_by)
   } else {
     nmd <- nmd %>% dplyr::arrange(ID) %>%
-      mutate(facet_label = paste0("ID: ", ID))
+      dplyr::mutate(facet_label = paste0("ID: ", ID))
   }
-
+  
   # Calculate outliers
   if(!is.null(strat_by) && strat_by != '' && !boxplot) {
     nmd <- categorize_outliers(df              = nmd,
@@ -648,10 +652,10 @@ do_data_page_ind_plot <- function(nmd,
                                strat_by        = strat_by,
                                debug           = debug)
   } # end of calculate outliers
-
+  
   # Create a new factor for ID with levels in the order they appear in the sorted data frame
   nmd$facet_label <- factor(nmd$facet_label, levels = unique(nmd$facet_label))
-
+  
   if(color_by != "") {
     if(all(is.na(nmd[[color_by]]))) {
       shiny::showNotification(paste0("WARNING: All values are NA in ", color_by, ". No coloring performed."), type = "warning", duration = 10)
@@ -660,28 +664,28 @@ do_data_page_ind_plot <- function(nmd,
       # Only applicable if the column is character type as int columns with NAs will fail
       nmd <- handle_blanks(nmd, color_by)
       nmd[[color_by]] <- as.factor(nmd[[color_by]])
-
+      
       # Create a named vector of colors - this is required to be consistent with ind plots if some pages don't have all factor levels during color_by
       n <- nlevels(nmd[[color_by]])
       color_map <- scales::hue_pal()(n)
       named_color_vector <- setNames(color_map, levels(nmd[[color_by]]))
     }
   }
-
+  
   # Safeguard for blanks ("") since plotly has bugs with handling it
   nmd <- handle_blanks(nmd, y_axis)
   nmd <- handle_blanks(nmd, x_axis)
-
+  
   # Calculating the entire dataset's limits to ensure consistency across pages for same_scale
   if(!is.character(nmd[[x_axis]])) {
     nmdx <- nmd %>%
-      filter(!!dplyr::sym(x_axis) != 0)
+      dplyr::filter(!!dplyr::sym(x_axis) != 0)
   } else {
     nmdx <- nmd
   }
   if(!is.character(nmd[[y_axis]])) {
     nmdy <- nmd %>%
-      filter(!!dplyr::sym(y_axis) != 0)
+      dplyr::filter(!!dplyr::sym(y_axis) != 0)
   } else {
     nmdy <- nmd
   }
@@ -689,7 +693,7 @@ do_data_page_ind_plot <- function(nmd,
   max_data_x_all  <- max(as.numeric(as.character(nmdx[[x_axis]])), na.rm = TRUE)
   min_data_y_all  <- min(as.numeric(as.character(nmdy[[y_axis]])), na.rm = TRUE)
   max_data_y_all  <- max(as.numeric(as.character(nmdy[[y_axis]])), na.rm = TRUE)
-
+  
   ## Handling doses
   if(plot_dosing && 'EVID' %in% names(nmd) & !boxplot & dose_col != "") {
     # Creating dummy variables - XVAR, YVAR, NAMT
@@ -698,27 +702,27 @@ do_data_page_ind_plot <- function(nmd,
     nmd$XVAR <- as.numeric(as.character(nmd[[x_axis]]))
     nmd$YVAR <- as.numeric(as.character(nmd[[y_axis]]))
     max_dose_all <- max(nmd$NAMT, na.rm = TRUE)
-
+    
     # Scaling the dose such that it is plotted nicely with the maximum dose at height dose_height of the maximum y variable
     # A new column SAMT (Scaled AMT) is created which will be used for plotting the geom_rect
     nmd <- nmd %>%
-      group_by(facet_label) %>% # group_by(ID)
-      mutate(
+      dplyr::group_by(facet_label) %>% # group_by(ID)
+      dplyr::mutate(
         max_dose       = max(NAMT, na.rm = TRUE),
         min_xvar       = round(min(XVAR, na.rm = TRUE), digits = 3),
         max_xvar       = round(max(XVAR, na.rm = TRUE), digits = 3),
         min_yvar       = min(YVAR, na.rm = TRUE),
         max_yvar       = max(YVAR, na.rm = TRUE)) %>%
-      ungroup()
-
+      dplyr::ungroup()
+    
     # Safeguard for when a subject has no valid Y- or X-values
     # Replaces any bad IDs with no observations to NA
     nmd[(nmd==Inf | nmd == -Inf)] <- NA
-
+    
     dose_height     <- 0.5 # Changing how tall the doses should be in relation to the y variable (0.5 means max dose reaches middle of y_axis range)
-
+    
     nmd <- nmd %>%
-      mutate(
+      dplyr::mutate(
         max_dose_all = max(NAMT, na.rm = TRUE),
         min_data_y   = min(YVAR, na.rm = TRUE),
         max_data_y   = max(YVAR, na.rm = TRUE),
@@ -733,27 +737,27 @@ do_data_page_ind_plot <- function(nmd,
         max_xvar     = dplyr::case_when(is.na(max_xvar) ~ max_data_x,
                                         TRUE            ~ max_xvar)
       )
-
+    
     if(same_scale) {
       nmd$scaling_factor <- max_data_y_all / max_dose_all * dose_height
     } else {
       nmd$scaling_factor <- ((nmd$max_yvar - nmd$min_yvar) * dose_height + nmd$min_yvar) / nmd$max_dose #nmd$max_dose_all doesn't work well
     }
-
+    
     nmd$SAMT           <- nmd$NAMT * nmd$scaling_factor
-
+    
   }
-
+  
   if(same_scale) { # Replace each subject's max and min values with the entire dataset's
-
+    
     nmd <- nmd %>%
-      mutate(min_xvar = min_data_x_all,
-             max_xvar = max_data_x_all,
-             min_yvar = min_data_y_all,
-             max_yvar = max_data_y_all
+      dplyr::mutate(min_xvar = min_data_x_all,
+                    max_xvar = max_data_x_all,
+                    min_yvar = min_data_y_all,
+                    max_yvar = max_data_y_all
       )
   }
-
+  
   # Filter the data to be page Z, where each page has X rows * Y cols
   if(is.null(filter_id[1]) || filter_id[1] == '') { # selectizeInput with multiple choices are picky
     unique_ids         <- unique(nmd$ID)
@@ -764,45 +768,45 @@ do_data_page_ind_plot <- function(nmd,
   } else {
     nmd <- nmd %>% dplyr::filter(ID %in% filter_id)
   }
-
-
+  
+  
   if(plot_dosing && 'EVID' %in% names(nmd) & !boxplot & dose_col != "") {
     id_dose_expand <- nmd %>%
-      filter(EVID == 1 | EVID == 4)
-
+      dplyr::filter(EVID == 1 | EVID == 4)
+    
     if(nrow(id_dose_expand) >= 1) { # Create "DOSETIME" column if there are any valid dosing rows, which will be used for plotting dose lines
       id_dose_expand <- id_dose_expand %>%
         expand_addl_ii(., x_axis = x_axis, dose_col = dose_col)
     }
-
+    
     if(debug) {
       message("Dosing expanded:")
       dplyr::glimpse(id_dose_expand)
     }
-
+    
     # Gets unique dose amount rows
     #id_dose_unique <- id_dose_expand %>% distinct(ID, !!dplyr::sym(dose_col), .keep_all = TRUE)
-    id_dose_unique <- id_dose_expand %>% distinct(facet_label, !!dplyr::sym(dose_col), .keep_all = TRUE)
+    id_dose_unique <- id_dose_expand %>% dplyr::distinct(facet_label, !!dplyr::sym(dose_col), .keep_all = TRUE)
     id_dose_unique[[dose_col]] <- as.numeric(as.character(id_dose_unique[[dose_col]])) # in case dose_col is picked for Color by
-    id_dose_unique <- id_dose_unique %>% mutate(dosename = paste0(round(.[[dose_col]], digits = 2), dose_units))
-
+    id_dose_unique <- id_dose_unique %>% dplyr::mutate(dosename = paste0(round(.[[dose_col]], digits = 2), dose_units))
+    
   }
-
+  
   # Retain EVID == 0 for plotting
   if('EVID' %in% colnames(nmd)) {
-    nmd <- nmd %>% filter(EVID == 0)
+    nmd <- nmd %>% dplyr::filter(EVID == 0)
   }
-
+  
   # Start of ggplot initialization
   if(color_by != "" && !boxplot & !all(is.na(nmd[[color_by]]))) {
     a <- ggplot2::ggplot(data = nmd, ggplot2::aes(x = .data[[x_axis]], y = .data[[y_axis]], group = ID, color = !!dplyr::sym(color_by))) +
       ggplot2::scale_color_manual(values = named_color_vector)
-
+    
   } else {
     a <- ggplot2::ggplot(data = nmd, ggplot2::aes(x = .data[[x_axis]], y = .data[[y_axis]], group = ID))
-
+    
   }
-
+  
   if(boxplot) {
     if(length(unique(nmd[[x_axis]])) > boxplot_x_threshold) {
       a <- ggplot2::ggplot() +
@@ -812,7 +816,7 @@ do_data_page_ind_plot <- function(nmd,
       return(a)
     }
     nmd[[x_axis]] <- as.factor(nmd[[x_axis]])
-
+    
     if(is.character(nmd[[y_axis]]) || length(unique(nmd[[y_axis]])) <= discrete_threshold ) { # ... or if there are <= discrete_threshold unique values of y-axis
       shiny::showNotification(paste0("WARNING: Treating Y-axis as discrete as it is a character type, or there are <=", discrete_threshold ," unique Y values."), type = "warning", duration = 10)
       treat_y_axis_as_discrete <- TRUE
@@ -821,18 +825,18 @@ do_data_page_ind_plot <- function(nmd,
       treat_y_axis_as_discrete <- FALSE
       nmd[[y_axis]] <- as.numeric(nmd[[y_axis]])
     }
-
+    
     if(color_by != "" && !all(is.na(nmd[[color_by]]))) {
       a <- ggplot2::ggplot(data = nmd %>% dplyr::distinct(ID, .keep_all = TRUE), ggplot2::aes(x = .data[[x_axis]], y = .data[[y_axis]], color = !!dplyr::sym(color_by))) +
         ggplot2::scale_color_manual(values = named_color_vector)
     } else {
       a <- ggplot2::ggplot(data = nmd %>% dplyr::distinct(ID, .keep_all = TRUE), ggplot2::aes(x = .data[[x_axis]], y = .data[[y_axis]]))
     }
-
+    
     # Calculate the number of observations for each category
     df_count <- nmd %>%
       dplyr::distinct(ID, .keep_all = TRUE)
-
+    
     if(facet_name != "") {
       if(facet_name != x_axis) {
         if(treat_y_axis_as_discrete) {
@@ -853,7 +857,7 @@ do_data_page_ind_plot <- function(nmd,
         }
       }
     } else { ## end of valid facet_name
-
+      
       if(treat_y_axis_as_discrete) {
         df_count <- df_count %>%
           dplyr::count(!!dplyr::sym(x_axis), !!dplyr::sym(y_axis))
@@ -862,16 +866,16 @@ do_data_page_ind_plot <- function(nmd,
           dplyr::count(!!dplyr::sym(x_axis))
       }
     }
-
+    
     if(treat_y_axis_as_discrete) {
       a <- a +
         ggplot2::geom_count() + ggplot2::scale_size_area(max_size = 12)
-
+      
       if(label_size > 0) {
         a <- a +
           ggplot2::geom_text(data = df_count, ggplot2::aes(x = .data[[x_axis]], y = .data[[y_axis]], label = paste0(n), size = n, group = NULL), color = "black", vjust = 2, size = label_size)
       }
-
+      
     } else {
       a <- a +
         ggplot2::geom_boxplot(varwidth = TRUE)
@@ -880,20 +884,20 @@ do_data_page_ind_plot <- function(nmd,
           ggplot2::geom_text(data = df_count, ggplot2::aes(x = .data[[x_axis]], y = max(nmd[[y_axis]], na.rm = TRUE) * 1.02, label = paste0("N=", n),  group = NULL), color = "black", vjust = 2, size = label_size)
       }
     }
-
+    
   } else { # end of boxplot check
-
+    
     ## Dosing lines
     if(plot_dosing && ("EVID" %in% colnames(nmd)) & dose_col != "" & !boxplot) {
       if('DOSETIME' %in% colnames(id_dose_expand)) { # If DOSETIME is not present that means expansion has failed - then don't do anything
         id_dose_expand$INFDUR <- id_dose_expand$DOSETIME # Infusion Duration is the same as dose time unless rate is supplied
-
+        
         # Extends geom_rect by infusion rates
         if("RATE" %in% colnames(id_dose_expand)) {
           if(any(subset(id_dose_expand, !is.na(RATE))$RATE > 0)) {
             # Safeguard if RATE is negative or NA
             id_dose_expand <- id_dose_expand %>%
-              mutate(
+              dplyr::mutate(
                 INFDUR = dplyr::case_when(
                   !is.na(RATE) & RATE > 0 ~ DOSETIME + (NAMT / RATE),
                   TRUE                    ~ DOSETIME
@@ -901,9 +905,9 @@ do_data_page_ind_plot <- function(nmd,
               )
           }
         }
-
+        
         linecolour <- "#ED5C42A0"
-
+        
         a <- a +
           ggplot2::geom_vline(data = id_dose_expand, ggplot2::aes(xintercept = DOSETIME), alpha = 0.1) +
           ggplot2::geom_rect(data   = id_dose_expand, ggplot2::aes(
@@ -917,52 +921,51 @@ do_data_page_ind_plot <- function(nmd,
             color = linecolour,
             show.legend = FALSE
           )
-
+        
         ## Dosing text
         # if(require(ggrepel)) {
         #   a <- a + ggrepel::geom_text_repel(data = id_dose_unique, ggplot2::aes(x = .data[[x_axis]], y = SAMT, label = dosename, color = NULL),
         #                                     alpha = 0.8,
         #                                     size = label_size)
         # } else {
-          a <- a + ggplot2::geom_text(data = id_dose_unique, ggplot2::aes(x = .data[[x_axis]], y = SAMT, label = dosename, group = NULL, color = NULL),
-                                      hjust = 1, vjust = 1, show.legend = FALSE, size = label_size, alpha = 0.8)
+        a <- a + ggplot2::geom_text(data = id_dose_unique, ggplot2::aes(x = .data[[x_axis]], y = SAMT, label = dosename, group = NULL, color = NULL),
+                                    hjust = 1, vjust = 1, show.legend = FALSE, size = label_size, alpha = 0.8)
         #}
       } # End of DOSETIME column check
     } # End of dosing lines
-
+    
     ### LLOQ
-
+    
     # LLOQ line
     if(lloq_name != '' && lloq_name %in% colnames(nmd)) {
       nmd[[lloq_name]] <- as.numeric(as.character(nmd[[lloq_name]]))
       a <- a + ggplot2::geom_hline(yintercept = unique(nmd[[lloq_name]]), colour = "orange", linetype = "dashed", size = 0.5, alpha = 0.5)
     }
-
+    
     a <- a + ggplot2::geom_point(data = nmd, alpha = 1) +
       ggplot2::geom_line(data = nmd, alpha = 0.7)
-
+    
     # Highlighting variable value(s)
     if(!is.null(highlight_var) && highlight_var != "" && !is.null(highlight_var_values[1]) && highlight_var_values[1] != "") {
       nmd_highlight <- nmd %>% dplyr::filter(!!dplyr::sym(highlight_var) %in% highlight_var_values)
       a <- a +
         geom_point(data = nmd_highlight, shape = 8, size = 4, alpha = 1, color = "red") # big red asterix shape
     }
-
   }
-
+  
   a <- a + ggplot2::xlab(x_axis) +
     ggplot2::ylab(y_axis) +
     ggplot2::theme_bw() +
     ggplot2::labs(color = color_by)
-
+  
   # median line and smoother not relevant for ind plots
-
+  
   if(dolm & is.numeric(nmd[[x_axis]]) & is.numeric(nmd[[y_axis]]) & !boxplot) {
     # Calculate linear regression and R-squared value for each facet
     df_stats <- lm_eqn(df = nmd, facet_name = facet_name, x = x_axis, y = y_axis)
-
+    
     data <- ggplot2::ggplot_build(a)$data[[1]]
-
+    
     if(same_scale) {
       med_x <- (min_data_x_all + max_data_x_all) / 2
       max_y <- max_data_y_all
@@ -970,14 +973,14 @@ do_data_page_ind_plot <- function(nmd,
       med_x <- (min(data$x, na.rm = TRUE) + max(data$x, na.rm = TRUE))/2 # median works better for plotly, while min is better for ggplot
       max_y <- max(data$y, na.rm = TRUE)
     }
-
+    
     a <- a + ggplot2::stat_smooth(ggplot2::aes(group = NULL), method = "lm", formula = y ~ x, se = FALSE, colour = "grey", show.legend = FALSE)
     if(label_size > 0) {
       a <- a + ggplot2::geom_text(data = df_stats, ggplot2::aes(label = label, x = med_x, y = max_y, group = NULL, color = NULL),
                                   hjust = 0.5, vjust = 1, show.legend = FALSE, size = label_size)
     }
   }
-
+  
   if (facet_name != "") {
     if(facet_name == x_axis) {
       shiny::showNotification("ERROR: Facet variable cannot be the same as X-axis.", type = "error", duration = 10)
@@ -998,31 +1001,31 @@ do_data_page_ind_plot <- function(nmd,
       }
     }
   }
-
+  
   if (logy & is.numeric(nmd[[y_axis]])) {
     a <- a +
       ggplot2::scale_y_log10(breaks = logbreaks_y, labels = logbreaks_y) +
       ggplot2::annotation_logticks(sides = "l")
   }
-
+  
   if (logx & is.numeric(nmd[[x_axis]]) & !boxplot) {
     a <- a +
       ggplot2::scale_x_log10(breaks = logbreaks_x, labels = logbreaks_x) +
       ggplot2::annotation_logticks(sides = "b")
   }
-
+  
   if(same_scale) { ## coord_cartesian not well supported with log scales?
-
+    
     if(plot_dosing && ("EVID" %in% colnames(nmd)) & dose_col != "" & !boxplot) { # Gets the largest of either doses per individual or last observation time
       cc_xlim <- c(min(min_data_x_all, min(id_dose_expand$DOSETIME)),
                    max(max_data_x_all, max(id_dose_expand$DOSETIME)))
     } else {
       cc_xlim <- c(min_data_x_all, max_data_x_all)
     }
-
+    
     cc_ylim <- c(min_data_y_all, # lower bound of y is not 0 to avoid log scale issues
                  max_data_y_all)
-
+    
     # if(logy & is.numeric(nmd[[y_axis]])) {
     #   cc_ylim <- log10(cc_ylim)
     # }
@@ -1030,21 +1033,21 @@ do_data_page_ind_plot <- function(nmd,
     # if(logx & is.numeric(nmd[[x_axis]])) {
     #   cc_xlim <- log10(cc_xlim)
     # }
-
+    
     if(debug) {
       message(paste0("cc_ylim: ", cc_ylim))
       message(paste0("cc_xlim: ", cc_xlim))
     }
-
+    
     a <- a + ggplot2::coord_cartesian(xlim = cc_xlim ,
                                       ylim = cc_ylim)
   } # end of same_scale
-
+  
   if (!is.null(plot_title)) {
     a <- a +
       ggplot2::ggtitle(plot_title)
   }
-
+  
   return(a)
 }
 

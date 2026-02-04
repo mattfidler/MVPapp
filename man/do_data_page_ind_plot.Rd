@@ -55,9 +55,9 @@ do_data_page_ind_plot(
 
 \item{filter_cmt}{Filter by this CMT}
 
-\item{sort_by}{Sort by one or more variables (a list)}
+\item{sort_by}{Sort by one or more variables (a list), default NULL}
 
-\item{strat_by}{Stratify by 1 variable and highlight outliers}
+\item{strat_by}{Stratify by 1 variable and highlight outliers, default ''}
 
 \item{highlight_range}{Flag potential outliers when they are higher or below this mean value of the group, a string}
 

@@ -5,7 +5,7 @@
 
 <span style="color:red;"><strong>Note: Please check
 <a href="https://github.com/Boehringer-Ingelheim/MVPapp">here</a> for
-earlier release notes of MVPapp (\<= v0.3.3).</strong></span>
+earlier versions of MVPapp (\<= v0.3.3).</strong></span>
 
 <!-- badges: start -->
 

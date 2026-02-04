@@ -1,3 +1,9 @@
+# MVPapp 0.3.5 (2025-02-04)
+
+## Bugfixes
+
+* Dosing info now displays correctly for all doses in Individual Plots (#2)
+
 # MVPapp 0.3.4 (2025-12-02)
 
 ## Features
