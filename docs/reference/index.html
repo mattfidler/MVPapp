@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MVPapp</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,8 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/automatic-translation.html">Automatic Model Translation</a></li>
+    <li><a class="dropdown-item" href="../articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/supply-passwords.html">Supplying Passworded Models</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -133,10 +134,22 @@
         <dd>Checks for validity of matrix</dd>
       </dl><dl><dt>
 
+          <code><a href="clean_llm_response.html">clean_llm_response()</a></code>
+
+        </dt>
+        <dd>Clean and Escape LLM Markdown Responses</dd>
+      </dl><dl><dt>
+
           <code><a href="code_preamble.html">code_preamble</a></code>
 
         </dt>
         <dd>Code editor preamble and postambles</dd>
+      </dl><dl><dt>
+
+          <code><a href="combine_uploaded_files.html">combine_uploaded_files()</a></code>
+
+        </dt>
+        <dd>Combine Multiple Uploaded Files into a Single File</dd>
       </dl><dl><dt>
 
           <code><a href="compare_dist_histogram.html">compare_dist_histogram()</a></code>
@@ -217,6 +230,12 @@
         <dd>Function to calculate exposures from IIV output</dd>
       </dl><dl><dt>
 
+          <code><a href="extract_file_content.html">extract_file_content()</a></code>
+
+        </dt>
+        <dd>Extract text content from a local file (pdf or text) and append to a prompt</dd>
+      </dl><dl><dt>
+
           <code><a href="extract_matrix.html">extract_matrix()</a></code>
 
         </dt>
@@ -245,6 +264,30 @@
 
         </dt>
         <dd>Generating log breaks and axis labels, mainly for plotly</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_api_key.html">get_api_key()</a></code>
+
+        </dt>
+        <dd>Retrieves the stored API key from a provider in .Renviron File</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_api_key_name.html">get_api_key_name()</a></code>
+
+        </dt>
+        <dd>Returns the designated API key name from a provider in .Renviron File</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_apollo_token.html">get_apollo_token()</a></code>
+
+        </dt>
+        <dd>Get Apollo OAuth Token</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_apollo_token_ext.html">get_apollo_token_ext()</a></code>
+
+        </dt>
+        <dd>Get Apollo OAuth Token (External)</dd>
       </dl><dl><dt>
 
           <code><a href="get_bin_times.html">get_bin_times()</a></code>
@@ -403,6 +446,12 @@
         <dd>Main function for the plot in Parameter Sensitivity Analysis</dd>
       </dl><dl><dt>
 
+          <code><a href="prepare_uploaded_files.html">prepare_uploaded_files()</a></code>
+
+        </dt>
+        <dd>Validate and Prepare Uploaded Files for LLM Processing</dd>
+      </dl><dl><dt>
+
           <code><a href="print_cov_plot.html">print_cov_plot()</a></code>
 
         </dt>
@@ -439,6 +488,24 @@
         <dd>Converts a matrix object into a list</dd>
       </dl><dl><dt>
 
+          <code><a href="refine_model_code.html">refine_model_code()</a></code>
+
+        </dt>
+        <dd>Provide a model code string and its compile error message to be refined</dd>
+      </dl><dl><dt>
+
+          <code><a href="run_dify_chat.html">run_dify_chat()</a></code>
+
+        </dt>
+        <dd>Send a chat request to a Dify Workflow via httr2</dd>
+      </dl><dl><dt>
+
+          <code><a href="run_ellmer_chat.html">run_ellmer_chat()</a></code>
+
+        </dt>
+        <dd>Send a chat request via an ellmer provider</dd>
+      </dl><dl><dt>
+
           <code><a href="run_mvp.html">run_mvp()</a></code>
 
         </dt>
@@ -452,6 +519,18 @@
       </dl><dl><dt>
 
           <code><a href="safely_eval.html">safely_eval()</a></code>
+
+        </dt>
+        <dd>purrr:safely wrappers for various functions</dd>
+      </dl><dl><dt>
+
+          <code><a href="safely_incProgress.html">safely_incProgress()</a></code>
+
+        </dt>
+        <dd>A safe version of shiny incProgress, mostly for used in testing</dd>
+      </dl><dl><dt>
+
+          <code><a href="safely_mcode.html">safely_mcode()</a></code>
 
         </dt>
         <dd>purrr:safely wrappers for various functions</dd>
@@ -473,6 +552,18 @@
 
         </dt>
         <dd>purrr:safely wrappers for various functions</dd>
+      </dl><dl><dt>
+
+          <code><a href="safely_showNotification.html">safely_showNotification()</a></code>
+
+        </dt>
+        <dd>A safe version of shiny notifications, mostly for used in testing</dd>
+      </dl><dl><dt>
+
+          <code><a href="safely_withProgress.html">safely_withProgress()</a></code>
+
+        </dt>
+        <dd>A safe version of shiny withProgress, mostly for used in testing</dd>
       </dl><dl><dt>
 
           <code><a href="sample_age_wt.html">sample_age_wt()</a></code>
@@ -545,6 +636,12 @@
 
         </dt>
         <dd>Helper function to handle ev_df transformations group</dd>
+      </dl><dl><dt>
+
+          <code><a href="translate_model_code.html">translate_model_code()</a></code>
+
+        </dt>
+        <dd>Upload, and translate a PDF file to model code via external API</dd>
       </dl><dl><dt>
 
           <code><a href="trim_columns.html">trim_columns()</a></code>

@@ -52,7 +52,7 @@ iterate_batch_runs(
 
 \item{gradient}{When TRUE, perform gradient runs in between lower/upper}
 
-\item{parallel_sim}{Default TRUE, uses the future and mrgsim.parallel packages !Not implemented live!}
+\item{parallel_sim}{Default FALSE, uses the future and mrgsim.parallel packages !Not implemented live!}
 
 \item{parallel_n}{The number of subjects required before parallelization is used !Not implemented live!}
 }

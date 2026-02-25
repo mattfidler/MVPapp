@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MVPapp</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
+<li><a class="dropdown-item" href="articles/automatic-translation.html">Automatic Model Translation</a></li>
+    <li><a class="dropdown-item" href="articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
     <li><a class="dropdown-item" href="articles/supply-passwords.html">Supplying Passworded Models</a></li>
   </ul>
 </li>
@@ -61,6 +62,7 @@
 <!-- badges: end -->
 <p><code>MVPapp</code> is an R package that bundles the <a href="https://mvp.boehringer-ingelheim.com/" target="_blank" class="external-link">Model Visualization Platform (MVP)</a> Shiny application for local use and/or deployment. MVP is an interactive pharmacometrics environment requiring minimal setup from the users, and is developed with user-friendliness as a top priority so even non-modelers may be able to explore different aspects of the models without too much hassle, whilst balancing complexity for advanced users. Some features include:<br>
 - Live code editing using <a href="https://github.com/metrumresearchgroup/mrgsolve" target="_blank" class="external-link">mrgsolve</a><br>
+- Automatic model translation using generative AI<br>
 - Flexible dosing regimens, supporting up to 5 independent dosing schedules per model<br>
 - Basic data exploration and data cleaning, and overlaying of data<br>
 - Quick NCA output and reporting<br>
@@ -100,7 +102,7 @@
 <p>This is the default landing page when the App is launched. It looks a bit empty at the moment, however it is very simple to start generating a model and show a plot. All important settings are neatly situated together on the same page so the user can appreciate in real-time whenever they change certain aspects of the model. This page should be the <strong>homepage</strong> as other pages of the app inherit settings from this page (e.g. dosing and axis choices).</p>
 <p><img src="www/simtab1.png"></p>
 <ol style="list-style-type: decimal">
-<li>Navigate to the “Select Model 1” box on the left hand side and choose a template model from the drop-down list, or upload your own .cpp file.
+<li>Navigate to the “Select Model 1” box on the left hand side and choose a template model from the drop-down list, or upload your own .cpp file. You can also upload a document for <strong>automatic model translation</strong> (more info at the bottom of the page).
 <ul>
 <li>Once a model is selected or uploaded, you can make further changes in the Code Editor below.<br>
 </li>
@@ -282,6 +284,11 @@
 <div class="section level2">
 <h2 id="extended-features-and-vignettes">Extended Features and Vignettes<a class="anchor" aria-label="anchor" href="#extended-features-and-vignettes"></a>
 </h2>
+<div class="section level3">
+<h3 id="ai-model-translation">AI model translation<a class="anchor" aria-label="anchor" href="#ai-model-translation"></a>
+</h3>
+<p>Please see the article on <a href="https://stevechoy.github.io/MVPapp/articles/automatic-translation.html">Automatic Model Translation</a>, or access the vignette on this topic in R (<code>vignette("automatic-translation", package = "MVPapp"</code>) for a short guide on how to set up MVP to use generative AI models to translate any document into mrgsolve code.</p>
+</div>
 <div class="section level3">
 <h3 id="providing-external-models-and-changing-default-settings">Providing external models and changing default settings<a class="anchor" aria-label="anchor" href="#providing-external-models-and-changing-default-settings"></a>
 </h3>

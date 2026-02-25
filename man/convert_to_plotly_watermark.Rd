@@ -6,7 +6,7 @@
 \usage{
 convert_to_plotly_watermark(
   ggplot_object,
-  opacity = 0.1,
+  opacity = 0.05,
   font_name = "Arial",
   format = "png",
   filename = "newplot",

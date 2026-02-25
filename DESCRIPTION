@@ -1,6 +1,6 @@
 Package: MVPapp
 Title: Model Visualization Platform
-Version: 0.3.5
+Version: 0.4.0
 Authors@R: c(
     person("Steve", "Choy", email = "steve.choy@outlook.com", role = c("aut", "cre")),
     person("Jin Gyu", "Kim", role = "aut"))
@@ -43,11 +43,13 @@ Imports: bslib (>= 0.5.1),
          stringr,
          tibble,
          tidyr
-Suggests: foreign,
+Suggests: ellmer (>= 0.4.0),
+          foreign,
           ggrepel,
           knitr,
           ncar,
           NonCompart,
+          pdftools,
           readr,
           rmarkdown,
           shinyalert

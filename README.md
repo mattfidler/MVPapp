@@ -22,6 +22,7 @@ complexity for advanced users. Some features include:
 - Live code editing using
 <a href="https://github.com/metrumresearchgroup/mrgsolve"
 target="_blank">mrgsolve</a>  
+- Automatic model translation using generative AI  
 - Flexible dosing regimens, supporting up to 5 independent dosing
 schedules per model  
 - Basic data exploration and data cleaning, and overlaying of data  
@@ -87,7 +88,8 @@ page (e.g. dosing and axis choices).
 
 1.  Navigate to the “Select Model 1” box on the left hand side and
     choose a template model from the drop-down list, or upload your own
-    .cpp file.
+    .cpp file. You can also upload a document for **automatic model
+    translation** (more info at the bottom of the page).
     - Once a model is selected or uploaded, you can make further changes
       in the Code Editor below.  
     - You may also copy across your own model code by selecting the
@@ -380,6 +382,15 @@ demographics. 
 ![](www/expplot.png)
 
 ## Extended Features and Vignettes
+
+### AI model translation
+
+Please see the article on [Automatic Model
+Translation](https://stevechoy.github.io/MVPapp/articles/automatic-translation.html),
+or access the vignette on this topic in R
+(`vignette("automatic-translation", package = "MVPapp"`) for a short
+guide on how to set up MVP to use generative AI models to translate any
+document into mrgsolve code.
 
 ### Providing external models and changing default settings
 

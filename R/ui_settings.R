@@ -192,11 +192,35 @@ bspop_select_model    <- 'Choose a template model, or select "Blank Template" to
 #' @export
 bspop_param_values    <- 'Once a model has been generated, all fixed effects parameters from the model code (i.e. inside $PARAM) will become available to be adjusted dynamically in real-time (however it does not feedback into the model code text).<br><br>Note: Non-sensible / unphysiological values may result in the app crashing and should be avoided.'
 #' @export
-bspop_download_cpp_model <- 'Save current model as a .cpp file including any real-time changes to the parameter values (fixed effects).<br><br>Note: The model must first be generated before the code can be downloaded!'
+bspop_download_cpp_model <- 'Save current model as a .cpp file including any real-time changes to the parameter values (fixed effects).<br><br>Note: The model must first be successfully generated before the code can be downloaded!'
 #' @export
 bspop_model_code      <- 'Refer to the mrgsolve user guide (provided on the first line in the code editor) on the required syntax. After editing, click on the "Generate Model" button.<br><br>Note: If the model fails to compile, check the "Model Info (Console)" box below for more information.'
 #' @export
 bspop_model_info_console <- 'If the model build was successful, the generated model info will be summarized below. Otherwise, it will display the error message during compilation.'
+#' @export
+llm_pdffile_label     <- shiny::HTML(paste0("Upload File(s) ",
+                                            '<span style="color: red; font-weight: bold;">[Experimental]</span>',
+                                            "<i class='fa fa-question-circle' title='This feature requires a valid API key associated with the selected LLM provider. For quicker results (and reduced token usage), the file(s) should contain only relevant pages (e.g. model description, parameters, equations, and/or schematic).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_parse_locally    <- shiny::HTML(paste0("Parse Locally",
+                                           "<i class='fa fa-question-circle' title='Parse PDF / text file (.txt/.mod/.ctl) locally and bypass file upload, which may be required if the LLM provider does not natively support file attachments (it can also reduce token usage). Note that this method extracts only text, which may be less accurate for files with lots of images.' style='margin-left: 3px;'></i>"))
+#' @export
+llm_accept_single_types <- c(".pdf", ".txt", ".docx", ".html", ".md", ".markdown", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".eml", ".msg", ".json", ".yaml", ".yml", ".mod", ".ctl")
+#' @export
+llm_accept_multi_types  <- c(".pdf", ".txt", ".mod", ".ctl")
+#' @export
+llm_choices_label     <- shiny::HTML(paste0("Select LLM",
+                                            "<i class='fa fa-question-circle' title='MVP supports several main LLM providers (requires separate API keys). This requires the .Renviron file be configured correctly (note: the api_chat URL argument must also be provided if using a OpenAI-compatible API).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_max_retries_label <- shiny::HTML(paste0("Retries ",
+                                            "<i class='fa fa-question-circle' title='Number of automatic fix attempts if model compilation fails.' style='margin-left: 3px;'></i>"))
+#' @export
+llm_compile_success   <- paste0("✅ Internal compilation check OK! Please still check code for correctness.")
+#' @export
+llm_compile_error     <- paste0("❌ Internal compilation failed!")
+#' @export
+llm_max_retries_error <- paste0("❌ Max retries reached. Model still contains errors.")
+
 
 
 ## Dosing Regimen
@@ -307,7 +331,7 @@ label_y_axis_sim_1    <- 'Select Y-axis for Model 1'
 #' @export
 label_y_axis_sim_2    <- 'Select Y-axis for Model 2'
 #' @export
-bspop_y_axis_sim      <- 'Variables inside $TABLE or $CAPTURE in the model code will be available for selection.'
+bspop_y_axis_sim      <- 'Variables inside $CAPTURE and $CMT in the model code will be available for selection.'
 
 #' @export
 label_y_axis_data     <- 'Select Y-axis for Dataset'

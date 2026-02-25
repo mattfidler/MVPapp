@@ -4,19 +4,19 @@
 \alias{smart_x_axis}
 \title{Function to improve default x-axis breaks}
 \usage{
-smart_x_axis(p1, max_x = NULL, xvar = "TIMEADJ", xlabel, debug = FALSE)
+smart_x_axis(p1, max_x = NULL, xlabel, debug = FALSE)
 }
 \arguments{
 \item{p1}{ggplot object}
 
 \item{max_x}{Max x-axis value, will be derived from p1 if it is set to NULL}
 
-\item{xvar}{x variable string to be used to derive max_x}
-
 \item{xlabel}{Will only apply when xlabel is either "Time (hours)",
 "Time (weeks)", "Time (days)", or "Time (months)}
 
 \item{debug}{Shows debug messages}
+
+\item{xvar}{x variable string to be used to derive max_x}
 }
 \value{
 a ggplot object

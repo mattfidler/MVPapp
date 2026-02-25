@@ -17,7 +17,7 @@ to it's state prior to calling run_mvp."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">MVPapp</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,8 @@ to it's state prior to calling run_mvp."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/automatic-translation.html">Automatic Model Translation</a></li>
+    <li><a class="dropdown-item" href="../articles/data-exploration.html">Effective Exploratory Data Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/supply-passwords.html">Supplying Passworded Models</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,6 +67,26 @@ to it's state prior to calling <code>run_mvp</code>.</p>
 <span>  internal_version <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  use_bi_styling <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  pw_models_path <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  llm_choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Claude"</span>, <span class="st">"Gemini"</span>, <span class="st">"OpenAI"</span>, <span class="st">"OpenRouter"</span>, <span class="st">"OpenAI-Compatible"</span>,</span>
+<span>    <span class="st">"DeepSeek"</span>, <span class="st">"Azure OpenAI"</span>, <span class="st">"AWS Bedrock"</span><span class="op">)</span>,</span>
+<span>  api_upload <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  api_chat <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  user_id <span class="op">=</span> <span class="st">"mrgsolve_translator"</span>,</span>
+<span>  user_id_retry <span class="op">=</span> <span class="st">"mrgsolve_translator"</span>,</span>
+<span>  reuse_context <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  model_gemini <span class="op">=</span> <span class="st">"gemini-3-flash-preview"</span>,</span>
+<span>  model_openai <span class="op">=</span> <span class="st">"gpt-5-mini"</span>,</span>
+<span>  model_anthropic <span class="op">=</span> <span class="st">"claude-sonnet-4-6"</span>,</span>
+<span>  model_openrouter <span class="op">=</span> <span class="st">"arcee-ai/trinity-large-preview:free"</span>,</span>
+<span>  model_openai_compatible <span class="op">=</span> <span class="st">"gpt-5-mini"</span>,</span>
+<span>  model_deepseek <span class="op">=</span> <span class="st">"deepseek-reasoner"</span>,</span>
+<span>  model_apollo <span class="op">=</span> <span class="st">"gpt-5.2"</span>,</span>
+<span>  model_azure <span class="op">=</span> <span class="st">"gpt-5.2"</span>,</span>
+<span>  model_aws <span class="op">=</span> <span class="st">"anthropic.claude-sonnet-4-6"</span>,</span>
+<span>  temperature <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  llm_seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  model_lang <span class="op">=</span> <span class="st">"mrgsolve"</span>,</span>
+<span>  prompts_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shiny/prompts.R"</span>, package <span class="op">=</span> <span class="st">"MVPapp"</span><span class="op">)</span>,</span>
 <span>  show_debugging_msg <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -99,6 +120,82 @@ to it's state prior to calling <code>run_mvp</code>.</p>
 <dd><p>Character. Default NA_character_. Provide a path to source password-gated models.</p></dd>
 
 
+<dt id="arg-llm-choices">llm_choices<a class="anchor" aria-label="anchor" href="#arg-llm-choices"></a></dt>
+<dd><p>Vector. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible"</p></dd>
+
+
+<dt id="arg-api-upload">api_upload<a class="anchor" aria-label="anchor" href="#arg-api-upload"></a></dt>
+<dd><p>Character. Default NA_character_. API upload URL when using Dify-based workflows</p></dd>
+
+
+<dt id="arg-api-chat">api_chat<a class="anchor" aria-label="anchor" href="#arg-api-chat"></a></dt>
+<dd><p>Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers</p></dd>
+
+
+<dt id="arg-user-id">user_id<a class="anchor" aria-label="anchor" href="#arg-user-id"></a></dt>
+<dd><p>Character. Default mrgsolve_translator. User ID for LLMs.</p></dd>
+
+
+<dt id="arg-user-id-retry">user_id_retry<a class="anchor" aria-label="anchor" href="#arg-user-id-retry"></a></dt>
+<dd><p>Character. Default mrgsolve_translator. User ID for submitting retries to LLMs.</p></dd>
+
+
+<dt id="arg-reuse-context">reuse_context<a class="anchor" aria-label="anchor" href="#arg-reuse-context"></a></dt>
+<dd><p>Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.</p></dd>
+
+
+<dt id="arg-model-gemini">model_gemini<a class="anchor" aria-label="anchor" href="#arg-model-gemini"></a></dt>
+<dd><p>Character. Default gemini-3-flash-preview. Model for Gemini.</p></dd>
+
+
+<dt id="arg-model-openai">model_openai<a class="anchor" aria-label="anchor" href="#arg-model-openai"></a></dt>
+<dd><p>Character. Default gpt-5.2. Model for OpenAI / ChatGPT.</p></dd>
+
+
+<dt id="arg-model-anthropic">model_anthropic<a class="anchor" aria-label="anchor" href="#arg-model-anthropic"></a></dt>
+<dd><p>Character. Default claude-sonnet-4-6. Model for Anthropic / Claude.</p></dd>
+
+
+<dt id="arg-model-openrouter">model_openrouter<a class="anchor" aria-label="anchor" href="#arg-model-openrouter"></a></dt>
+<dd><p>Character. Default arcee-ai/trinity-large-preview:free. Model for OpenRouter.</p></dd>
+
+
+<dt id="arg-model-openai-compatible">model_openai_compatible<a class="anchor" aria-label="anchor" href="#arg-model-openai-compatible"></a></dt>
+<dd><p>Character. Default gpt-5-mini. Model for OpenAI-compatible providers.</p></dd>
+
+
+<dt id="arg-model-deepseek">model_deepseek<a class="anchor" aria-label="anchor" href="#arg-model-deepseek"></a></dt>
+<dd><p>Character. Default deepseek-reasoner. Model for DeepSeek.</p></dd>
+
+
+<dt id="arg-model-apollo">model_apollo<a class="anchor" aria-label="anchor" href="#arg-model-apollo"></a></dt>
+<dd><p>Character. Default gpt-5.2 (BI-only)</p></dd>
+
+
+<dt id="arg-model-azure">model_azure<a class="anchor" aria-label="anchor" href="#arg-model-azure"></a></dt>
+<dd><p>Character. Default gpt-5.2. Model for Azure OpenAI.</p></dd>
+
+
+<dt id="arg-model-aws">model_aws<a class="anchor" aria-label="anchor" href="#arg-model-aws"></a></dt>
+<dd><p>Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.</p></dd>
+
+
+<dt id="arg-temperature">temperature<a class="anchor" aria-label="anchor" href="#arg-temperature"></a></dt>
+<dd><p>Numeric. Default 0.1. Between 0 (more deterministic) to 1 (more creative) (not all models support this).</p></dd>
+
+
+<dt id="arg-llm-seed">llm_seed<a class="anchor" aria-label="anchor" href="#arg-llm-seed"></a></dt>
+<dd><p>Numeric. Default 42. Seed number for LLMs (not all models support this).</p></dd>
+
+
+<dt id="arg-model-lang">model_lang<a class="anchor" aria-label="anchor" href="#arg-model-lang"></a></dt>
+<dd><p>Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)</p></dd>
+
+
+<dt id="arg-prompts-path">prompts_path<a class="anchor" aria-label="anchor" href="#arg-prompts-path"></a></dt>
+<dd><p>Prompts file. See vignette ("automatic-translation") for more information.</p></dd>
+
+
 <dt id="arg-show-debugging-msg">show_debugging_msg<a class="anchor" aria-label="anchor" href="#arg-show-debugging-msg"></a></dt>
 <dd><p>Logical. Default FALSE. Set to TRUE to output verbose working messages in the console, useful for debugging.</p></dd>
 
@@ -121,7 +218,9 @@ debug_mode = TRUE (and setting these options there as required).</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="https://stevechoy.github.io/MVPapp/articles/supply-passwords.html">https://stevechoy.github.io/MVPapp/articles/supply-passwords.html</a></p></div>
+    <div class="dont-index"><p><a href="https://stevechoy.github.io/MVPapp/articles/supply-passwords.html">https://stevechoy.github.io/MVPapp/articles/supply-passwords.html</a>
+<a href="https://stevechoy.github.io/MVPapp/articles/automatic-translation.html">https://stevechoy.github.io/MVPapp/articles/automatic-translation.html</a>
+<code><a href="https://ellmer.tidyverse.org/reference/chat-any.html" class="external-link">chat</a></code> for LLM chat interface.</p></div>
     </div>
 
     <div class="section level2">
@@ -133,6 +232,7 @@ debug_mode = TRUE (and setting these options there as required).</p>
 <span class="r-in"><span><span class="co"># could be useful in deployment</span></span></span>
 <span class="r-in"><span><span class="fu">run_mvp</span><span class="op">(</span>pw_models_path <span class="op">=</span> <span class="st">"path/to/your/private/models.R"</span><span class="op">)</span> <span class="co"># see</span></span></span>
 <span class="r-in"><span><span class="co"># "shiny/passworded_models_example.R" on how to set one up</span></span></span>
+<span class="r-in"><span><span class="fu">run_mvp</span><span class="op">(</span>llm_service <span class="op">=</span> <span class="st">"Claude"</span>, model_anthropic <span class="op">=</span> <span class="st">"claude-sonnet-4-6"</span>, temperature <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="co"># Uses Claude only with reproducible results</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

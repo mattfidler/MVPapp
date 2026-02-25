@@ -17,6 +17,25 @@
 #' @param internal_version Logical. Default TRUE. Setting to FALSE may allow generation of NCA reports when hosted on AWS with different access rights.
 #' @param use_bi_styling Logical. Default FALSE. Set to TRUE to insert BI logo (deprecated - currently inactive).
 #' @param pw_models_path Character. Default NA_character_. Provide a path to source password-gated models.
+#' @param llm_choices Vector. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible"
+#' @param api_upload Character. Default NA_character_. API upload URL when using Dify-based workflows
+#' @param api_chat Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers
+#' @param user_id Character. Default mrgsolve_translator. User ID for LLMs.
+#' @param user_id_retry Character. Default mrgsolve_translator. User ID for submitting retries to LLMs.
+#' @param reuse_context Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.
+#' @param model_gemini Character. Default gemini-3-flash-preview. Model for Gemini.
+#' @param model_openai Character. Default gpt-5.2. Model for OpenAI / ChatGPT.
+#' @param model_anthropic Character. Default claude-sonnet-4-6. Model for Anthropic / Claude.
+#' @param model_openrouter Character. Default arcee-ai/trinity-large-preview:free. Model for OpenRouter.
+#' @param model_openai_compatible Character. Default gpt-5-mini. Model for OpenAI-compatible providers.
+#' @param model_deepseek Character. Default deepseek-reasoner. Model for DeepSeek.
+#' @param model_apollo Character. Default gpt-5.2 (BI-only)
+#' @param model_azure Character. Default gpt-5.2. Model for Azure OpenAI.
+#' @param model_aws Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.
+#' @param temperature Numeric. Default 0.1. Between 0 (more deterministic) to 1 (more creative) (not all models support this).
+#' @param llm_seed Numeric. Default 42. Seed number for LLMs (not all models support this).
+#' @param model_lang Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)
+#' @param prompts_path Prompts file. See vignette ("automatic-translation") for more information.
 #' @param show_debugging_msg Logical. Default FALSE. Set to TRUE to output verbose working messages in the console, useful for debugging.
 #' @param ... [shiny::runApp()] parameters, [shiny::shinyApp()] parameters,
 #'        or parameters to pass to the Shiny app.
@@ -35,29 +54,70 @@
 #' # could be useful in deployment
 #' run_mvp(pw_models_path = "path/to/your/private/models.R") # see
 #' # "shiny/passworded_models_example.R" on how to set one up
+#' run_mvp(llm_service = "Claude", model_anthropic = "claude-sonnet-4-6", temperature = 0) # Uses Claude only with reproducible results
 #' }
 #' @note
 #' Adapted from https://github.com/jbryer/ShinyDemo/blob/master/R/run_shiny_app.R
 #' @seealso
 #' \url{https://stevechoy.github.io/MVPapp/articles/supply-passwords.html}
+#' \url{https://stevechoy.github.io/MVPapp/articles/automatic-translation.html}
+#' \code{\link[ellmer]{chat}} for LLM chat interface.
 #' @export
-run_mvp <- function(appDir              = system.file("shiny", package = "MVPapp"),
-                    insert_watermark    = TRUE,
-                    authentication_code = NA_character_,
-                    internal_version    = TRUE,
-                    use_bi_styling      = FALSE,
-                    pw_models_path      = NA_character_,
-                    show_debugging_msg  = FALSE,
+run_mvp <- function(appDir                  = system.file("shiny", package = "MVPapp"),
+                    insert_watermark        = TRUE,
+                    authentication_code     = NA_character_,
+                    internal_version        = TRUE,
+                    use_bi_styling          = FALSE,
+                    pw_models_path          = NA_character_,
+                    llm_choices             = c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Azure OpenAI", "AWS Bedrock"),
+                    api_upload              = NA_character_,
+                    api_chat                = NA_character_, 
+                    user_id                 = "mrgsolve_translator",
+                    user_id_retry           = "mrgsolve_translator", # Must use same user ID to carry same conversation, previously was "mrgsolve_refiner"
+                    reuse_context           = FALSE, # Re-use same conversation to keep original context for better re-iteration answers
+                    model_gemini            = "gemini-3-flash-preview",
+                    model_openai            = "gpt-5-mini", # "gpt-5-mini" "gpt-5.2"
+                    model_anthropic         = "claude-sonnet-4-6", # "claude-sonnet-4-6" # 
+                    model_openrouter        = "arcee-ai/trinity-large-preview:free",  # "openrouter/free"
+                    model_openai_compatible = "gpt-5-mini",
+                    model_deepseek          = "deepseek-reasoner",
+                    model_apollo            = "gpt-5.2",
+                    model_azure             = "gpt-5.2",
+                    model_aws               = "anthropic.claude-sonnet-4-6",
+                    temperature             = 0.1,
+                    llm_seed                = 42,
+                    model_lang              = "mrgsolve",
+                    prompts_path            = system.file("shiny/prompts.R", package = "MVPapp"),
+                    show_debugging_msg      = FALSE,
                     ...) {
-
+  
 # Create a list of the parameters
   params <- list(
-    insert_watermark    = insert_watermark,
-    authentication_code = authentication_code,
-    internal_version    = internal_version,
-    use_bi_styling      = use_bi_styling,
-    pw_models_path      = pw_models_path,
-    show_debugging_msg  = show_debugging_msg
+    insert_watermark        = insert_watermark,
+    authentication_code     = authentication_code,
+    internal_version        = internal_version,
+    use_bi_styling          = use_bi_styling,
+    pw_models_path          = pw_models_path,
+    llm_choices             = llm_choices,
+    api_upload              = api_upload,             
+    api_chat                = api_chat,
+    user_id                 = user_id,
+    user_id_retry           = user_id_retry,
+    reuse_context           = reuse_context,
+    model_gemini            = model_gemini,
+    model_openai            = model_openai,
+    model_anthropic         = model_anthropic,
+    model_openrouter        = model_openrouter,
+    model_openai_compatible = model_openai_compatible,
+    model_deepseek          = model_deepseek,
+    model_apollo            = model_apollo,
+    model_azure             = model_azure,
+    model_aws               = model_aws,
+    temperature             = temperature,
+    llm_seed                = llm_seed,
+    model_lang              = model_lang,
+    prompts_path            = prompts_path,
+    show_debugging_msg      = show_debugging_msg
   )
 
   shinyApp_args <- list()

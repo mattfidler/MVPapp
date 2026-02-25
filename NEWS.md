@@ -1,4 +1,14 @@
-# MVPapp 0.3.5 (2025-02-04)
+# MVPapp 0.4.0 (2026-02-19)
+
+## Features
+
+* Experimental feature of automatic model translation using LLMs. (#4)  
+
+## Bugfixes
+
+* Minor bugfixes and general performance improvements. (#3)  
+
+# MVPapp 0.3.5 (2026-02-04)
 
 ## Bugfixes
 

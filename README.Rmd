@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 
 `MVPapp` is an R package that bundles the [Model Visualization Platform (MVP)](https://mvp.boehringer-ingelheim.com/){target="_blank"} Shiny application for local use and/or deployment. MVP is an interactive pharmacometrics environment requiring minimal setup from the users, and is developed with user-friendliness as a top priority so even non-modelers may be able to explore different aspects of the models without too much hassle, whilst balancing complexity for advanced users. Some features include:\
 - Live code editing using [mrgsolve](https://github.com/metrumresearchgroup/mrgsolve){target="_blank"}\
+- Automatic model translation using generative AI\
 - Flexible dosing regimens, supporting up to 5 independent dosing schedules per model\
 - Basic data exploration and data cleaning, and overlaying of data\
 - Quick NCA output and reporting\
@@ -70,7 +71,7 @@ This is the default landing page when the App is launched. It looks a bit empty 
 
 ![](www/simtab1.png)
 
-1.  Navigate to the "Select Model 1" box on the left hand side and choose a template model from the drop-down list, or upload your own .cpp file.
+1.  Navigate to the "Select Model 1" box on the left hand side and choose a template model from the drop-down list, or upload your own .cpp file. You can also upload a document for **automatic model translation** (more info at the bottom of the page).  
     -   Once a model is selected or uploaded, you can make further changes in the Code Editor below.\
     -   You may also copy across your own model code by selecting the "Blank Template" model. Note that when you switch models, all changes are lost.
     -   Note that the **entire model code is a string** that is assigned to the `model_code` object, and initialized as `model_object`. Therefore, if the model code contains quotation marks, the user will have to remove those manually (or escape them using the back slash, `\`) to avoid compilation errors.\
@@ -205,6 +206,10 @@ Summary of exposure metrics are readily available to be viewed, which is handy w
 ![](www/expplot.png)
 
 ## Extended Features and Vignettes
+
+### AI model translation
+
+Please see the article on [Automatic Model Translation](https://stevechoy.github.io/MVPapp/articles/automatic-translation.html), or access the vignette on this topic in R (`vignette("automatic-translation", package = "MVPapp"`) for a short guide on how to set up MVP to use generative AI models to translate any document into mrgsolve code.
 
 ### Providing external models and changing default settings
 

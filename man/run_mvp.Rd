@@ -11,6 +11,26 @@ run_mvp(
   internal_version = TRUE,
   use_bi_styling = FALSE,
   pw_models_path = NA_character_,
+  llm_choices = c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible",
+    "DeepSeek", "Azure OpenAI", "AWS Bedrock"),
+  api_upload = NA_character_,
+  api_chat = NA_character_,
+  user_id = "mrgsolve_translator",
+  user_id_retry = "mrgsolve_translator",
+  reuse_context = FALSE,
+  model_gemini = "gemini-3-flash-preview",
+  model_openai = "gpt-5-mini",
+  model_anthropic = "claude-sonnet-4-6",
+  model_openrouter = "arcee-ai/trinity-large-preview:free",
+  model_openai_compatible = "gpt-5-mini",
+  model_deepseek = "deepseek-reasoner",
+  model_apollo = "gpt-5.2",
+  model_azure = "gpt-5.2",
+  model_aws = "anthropic.claude-sonnet-4-6",
+  temperature = 0.1,
+  llm_seed = 42,
+  model_lang = "mrgsolve",
+  prompts_path = system.file("shiny/prompts.R", package = "MVPapp"),
   show_debugging_msg = FALSE,
   ...
 )
@@ -27,6 +47,44 @@ run_mvp(
 \item{use_bi_styling}{Logical. Default FALSE. Set to TRUE to insert BI logo (deprecated - currently inactive).}
 
 \item{pw_models_path}{Character. Default NA_character_. Provide a path to source password-gated models.}
+
+\item{llm_choices}{Vector. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible"}
+
+\item{api_upload}{Character. Default NA_character_. API upload URL when using Dify-based workflows}
+
+\item{api_chat}{Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers}
+
+\item{user_id}{Character. Default mrgsolve_translator. User ID for LLMs.}
+
+\item{user_id_retry}{Character. Default mrgsolve_translator. User ID for submitting retries to LLMs.}
+
+\item{reuse_context}{Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.}
+
+\item{model_gemini}{Character. Default gemini-3-flash-preview. Model for Gemini.}
+
+\item{model_openai}{Character. Default gpt-5.2. Model for OpenAI / ChatGPT.}
+
+\item{model_anthropic}{Character. Default claude-sonnet-4-6. Model for Anthropic / Claude.}
+
+\item{model_openrouter}{Character. Default arcee-ai/trinity-large-preview:free. Model for OpenRouter.}
+
+\item{model_openai_compatible}{Character. Default gpt-5-mini. Model for OpenAI-compatible providers.}
+
+\item{model_deepseek}{Character. Default deepseek-reasoner. Model for DeepSeek.}
+
+\item{model_apollo}{Character. Default gpt-5.2 (BI-only)}
+
+\item{model_azure}{Character. Default gpt-5.2. Model for Azure OpenAI.}
+
+\item{model_aws}{Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.}
+
+\item{temperature}{Numeric. Default 0.1. Between 0 (more deterministic) to 1 (more creative) (not all models support this).}
+
+\item{llm_seed}{Numeric. Default 42. Seed number for LLMs (not all models support this).}
+
+\item{model_lang}{Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)}
+
+\item{prompts_path}{Prompts file. See vignette ("automatic-translation") for more information.}
 
 \item{show_debugging_msg}{Logical. Default FALSE. Set to TRUE to output verbose working messages in the console, useful for debugging.}
 
@@ -58,8 +116,11 @@ run_mvp(authentication_code = "some_password") # Password-lock the site,
 # could be useful in deployment
 run_mvp(pw_models_path = "path/to/your/private/models.R") # see
 # "shiny/passworded_models_example.R" on how to set one up
+run_mvp(llm_service = "Claude", model_anthropic = "claude-sonnet-4-6", temperature = 0) # Uses Claude only with reproducible results
 }
 }
 \seealso{
 \url{https://stevechoy.github.io/MVPapp/articles/supply-passwords.html}
+\url{https://stevechoy.github.io/MVPapp/articles/automatic-translation.html}
+\code{\link[ellmer]{chat}} for LLM chat interface.
 }

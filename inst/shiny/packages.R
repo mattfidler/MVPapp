@@ -4,6 +4,7 @@ required_packages <- list(
   data.table = "1.14.2", 
   dplyr = NULL,
   DT = NULL, 
+  #ellmer = "0.4.0", # suggested, not required
   flextable = "0.6.10",
   forcats = NULL,
   GGally = NULL,
@@ -13,6 +14,7 @@ required_packages <- list(
   htmltools = "0.5.5",
   magrittr = NULL,
   mrgsolve = "1.5.0",
+  #pdftools, # suggested, not required
   plotly = "4.10.1", 
   purrr = NULL,
   rhandsontable = "0.3.8",

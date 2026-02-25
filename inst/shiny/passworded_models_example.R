@@ -68,7 +68,8 @@ model_switch_conditions <- function(input_model_select, mcode_model_choice) {
     #'------------------------------------------'
     'Mrgsolve internal model library (modlib())'          = modlib_examples,
     'Blank Template'                                      = paste0(blank_template, mcode_model_choice),
-    'Upload .cpp File'                                    = paste0(blank_template, mcode_model_choice)
+    'Upload .cpp File'                                    = paste0(blank_template, mcode_model_choice),
+    'Upload File (AI Translation)'                        = paste0(blank_template, mcode_model_choice)
   ))
 }
 
