@@ -17,7 +17,7 @@
 #' @param internal_version Logical. Default TRUE. Setting to FALSE may allow generation of NCA reports when hosted on AWS with different access rights.
 #' @param use_bi_styling Logical. Default FALSE. Set to TRUE to insert BI logo (deprecated - currently inactive).
 #' @param pw_models_path Character. Default NA_character_. Provide a path to source password-gated models.
-#' @param llm_choices Vector. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible"
+#' @param llm_choices Character. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "Deepseek", "Azure OpenAI", "AWS Bedrock"
 #' @param api_upload Character. Default NA_character_. API upload URL when using Dify-based workflows
 #' @param api_chat Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers
 #' @param user_id Character. Default mrgsolve_translator. User ID for LLMs.
@@ -27,7 +27,7 @@
 #' @param model_openai Character. Default gpt-5.2. Model for OpenAI / ChatGPT.
 #' @param model_anthropic Character. Default claude-sonnet-4-6. Model for Anthropic / Claude.
 #' @param model_openrouter Character. Default arcee-ai/trinity-large-preview:free. Model for OpenRouter.
-#' @param model_openai_compatible Character. Default gpt-5-mini. Model for OpenAI-compatible providers.
+#' @param model_openai_compatible Character. Default gpt-5.2. Model for OpenAI-compatible providers.
 #' @param model_deepseek Character. Default deepseek-reasoner. Model for DeepSeek.
 #' @param model_apollo Character. Default gpt-5.2 (BI-only)
 #' @param model_azure Character. Default gpt-5.2. Model for Azure OpenAI.
@@ -44,7 +44,7 @@
 #' If the user wishes to run the App outside of the function (e.g. preparing for
 #' deployment on Posit Connect), this can be done by accessing shiny/app.R,
 #' which is located inside the folder of where the package was installed, and modify
-#' debug_mode = TRUE (and setting these options there as required).
+#' standalone_mode = TRUE (and setting these options there as required).
 #'
 #' @examples
 #' \dontrun{
@@ -76,10 +76,10 @@ run_mvp <- function(appDir                  = system.file("shiny", package = "MV
                     user_id_retry           = "mrgsolve_translator", # Must use same user ID to carry same conversation, previously was "mrgsolve_refiner"
                     reuse_context           = FALSE, # Re-use same conversation to keep original context for better re-iteration answers
                     model_gemini            = "gemini-3-flash-preview",
-                    model_openai            = "gpt-5-mini", # "gpt-5-mini" "gpt-5.2"
+                    model_openai            = "gpt-5.2", # "gpt-5-mini" "gpt-5.2"
                     model_anthropic         = "claude-sonnet-4-6", # "claude-sonnet-4-6" # 
                     model_openrouter        = "arcee-ai/trinity-large-preview:free",  # "openrouter/free"
-                    model_openai_compatible = "gpt-5-mini",
+                    model_openai_compatible = "gpt-5.2",
                     model_deepseek          = "deepseek-reasoner",
                     model_apollo            = "gpt-5.2",
                     model_azure             = "gpt-5.2",
