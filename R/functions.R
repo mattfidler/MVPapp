@@ -5827,8 +5827,6 @@ safely_incProgress <- function(amount, detail = NULL) {
 #' @importFrom httr2 resp_body_json last_response resp_body_string req_body_json
 #' @importFrom httr2 req_auth_bearer_token with_verbosity
 #' @importFrom curl form_file
-#' @importFrom ellmer chat chat_openai chat_claude chat_google_gemini content_pdf_file
-#' @importFrom ellmer params claude_file_upload
 #' @importFrom mime guess_type
 #' @importFrom pdftools pdf_text
 #' @importFrom stats setNames
@@ -6122,12 +6120,6 @@ translate_model_code <- function(ready_path,
 #' @param debug Displays debug messages
 #'
 #' @returns a named list of "answer", "conversation_id", "chat_obj"
-#' @importFrom shiny incProgress showNotification withProgress
-#' @importFrom httr2 request req_headers req_body_multipart req_retry req_perform
-#' @importFrom httr2 resp_body_json last_response resp_body_string req_body_json
-#' @importFrom httr2 req_auth_bearer_token
-#' @importFrom curl form_file
-#' @importFrom ellmer chat chat_openai chat_claude chat_google_gemini
 #' @importFrom stats setNames
 #' @export
 #-------------------------------------------------------------------------------
@@ -6468,10 +6460,6 @@ extract_file_content <- function(file_path,
 #'   \item{usage_info}{Named list with \code{input}, \code{output}, \code{total}
 #'     token counts and \code{model} label}
 #' }
-#'
-#' @importFrom httr2 request req_headers req_body_multipart req_retry req_perform
-#' @importFrom httr2 resp_body_json req_body_json
-#' @importFrom curl form_file
 #' @export
 #-------------------------------------------------------------------------------
 
@@ -6603,9 +6591,6 @@ run_dify_chat <- function(instruction_prompt,
 #'     token counts and \code{model} label}
 #' }
 #'
-#' @importFrom ellmer chat_google_gemini chat_openai chat_claude chat_openrouter
-#' @importFrom ellmer chat_openai_compatible google_upload claude_file_upload
-#' @importFrom ellmer content_pdf_file params chat_deepseek chat_azure_openai chat_aws_bedrock
 #' @importFrom withr with_options
 #' @export
 #-------------------------------------------------------------------------------
