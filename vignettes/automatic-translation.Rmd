@@ -19,9 +19,9 @@ knitr::opts_chunk$set(
 __Imagine how convenient it would be for any model described in the literature to be translated and simulated in real-time with a click of a button!__  
 
 
-With the recent advancements of generative AI, it is now possible (and _feasible_) to upload a file to a large language model (LLM), extract its relevant contents and convert it into model code.  
+With the recent advancements of generative AI, it is now possible (and _feasible_) to upload a file to a large language model (LLM), extract its relevant contents and convert it into model code in <1 minute. 
 
-This exciting feature in MVP is potentially a huge time-saver, especially for more complicated models such as complex PopPK/PD, PBPK, or QSP models.
+This feature in MVP is potentially a huge time-saver, especially for more complicated models such as complex PopPK/PD, PBPK, or QSP models.
 
 ## Pre-requisites
 
@@ -33,7 +33,7 @@ Alternatively, [OpenRouter](https://openrouter.ai/models){target="_blank"} also 
 
 ## Setup  
 
-Install the `ellmer` and the `pdftools` R packages if you don't currently have it (`install.packages(c("ellmer", "pdftools")`). If you are not sure, you can check by `print(requireNamespace("ellmer"))`. As of 2026-Feb, most of the major providers (Claude, Gemini, OpenAI, OpenRouter) are supported in MVP, and any other providers who share the same API as OpenAI should also work.  Please see below for a brief instruction of configuring API keys after package installation:  
+Install the `ellmer` and the `pdftools` R packages if you don't currently have it (`install.packages(c("ellmer", "pdftools")`). If you are not sure, you can check by `print(requireNamespace(c("ellmer", "pdftools")))`. As of 2026-Feb, most of the major providers (Claude, Gemini, OpenAI, OpenRouter) are supported in MVP, and any other providers who share the same API protocol as OpenAI should also work (by selecting the "OpenAI-Compatible" option).  Please see below for a brief instruction of configuring API keys after package installation:  
 
 1. Open up the `.Renviron` file (if you have the `usethis` package, run `usethis::edit_r_environ()`on the console)  
 2. Create a new entry for each provider that you would like to use, as follows:  
@@ -41,7 +41,7 @@ Install the `ellmer` and the `pdftools` R packages if you don't currently have i
   - Gemini: `GEMINI_API_KEY="your-key-here"`  
   - OpenAI: `OPENAI_API_KEY="your-key-here"`  
   - OpenRouter: `OPENROUTER_API_KEY="your-key-here"` 
-  - OpenAI-Compatible: `OPENAI_COMPATIBLE_API_KEY="your-key-here"` (includes Azure OpenAI, AWS Bedrock)
+  - OpenAI-Compatible: `OPENAI_COMPATIBLE_API_KEY="your-key-here"`
   - DeepSeek: `DEEPSEEK_API_KEY="your-key-here"`  
   - Azure OpenAI: `AZURE_OPENAI_API_KEY="your-key-here"`, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_OPENAI_ENDPOINT` [refer to ellmer documentation](https://ellmer.tidyverse.org/reference/chat_azure_openai.html){target="_blank"}  
   - AWS Bedrock: [refer to ellmer documentation](https://ellmer.tidyverse.org/reference/chat_aws_bedrock.html){target="_blank"}  
@@ -52,12 +52,12 @@ Install the `ellmer` and the `pdftools` R packages if you don't currently have i
   - `user_id_retry`: your user name to the provider during retries, defaults to `"mrgsolve_translator"`
   - `reuse_context`: keep the same conversation during retries to improve subsequent results, defaults to `FALSE` (see explanation below)    
   - `model_*`: Model name to use for your preferred provider, e.g. `model_openai` for ChatGPT, or `model_anthropic` for Claude, etc. Check each provider for the list of accepted model names.  
-  - `api_chat`: URL path if you are using an OpenAI-compatible provider, which feeds into the `base_url` argument during `ellmer::chat_openai_compatible()` call  
+  - `api_chat`: URL path if you are using an OpenAI-Compatible provider, which feeds into the `base_url` argument during `ellmer::chat_openai_compatible()` call  
   - `api_upload`: URL path if you are using a Dify-style provider for the upload location of files  
   - `temperature`: Temperature setting, ranging from 0 (more deterministic) to 1 (more creativity), defaults to `0.1`  
   - `llm_seed`: Seed number if supported by the LLM (however it still does not guarantee reproducibility), defaults to `42`
   - `model_lang`: Output `mrgsolve` or `nonmem` code in the response (see below).
-  - `prompts_path`: Path of prompts file, by default it is in the installed package directory of `MVPapp` (see below).  
+  - `prompts_path`: Path of the [prompts file](https://github.com/stevechoy/MVPapp/blob/master/inst/shiny/prompts.R){target="_blank"}, by default it is in the installed package directory of `MVPapp` (see below).  
 
 For example, if I am a Claude user and I want the results to be reproducible, I would launch MVP as follows:  
 
@@ -74,9 +74,9 @@ From the Model Selection drop-down list, choose the option called "Upload File (
 
 ### Locally Parsing Files
 
-The user has the option to bypass uploading of files, and instead parse the text locally and include that as part of the prompt to be sent to LLM. The advantage is that this is usually quicker, and with a reduced token usage (i.e. cheaper). The downside is that if the file contains lots of images such as model schematics, the contents will not be extracted and thus the response may become less accurate, compared to uploading the file.  
+The user has the option to bypass uploading of files, and instead parse the text locally and include that as part of the prompt to be sent to LLM (currently supports PDF and text files). The advantage is that this is usually quicker, and with a reduced token usage (i.e. cheaper). The downside is that if the file contains lots of images such as model schematics, the contents will not be extracted and thus the response may become less accurate, compared to uploading the file. In addition, not all providers allow separate uploading of (PDF) files. If that is the case, MVP will automatically parse the file contents locally.
 
-`r "\U0001F4A1"` Whether it makes sense to locally parse is __highly dependent__ on the file itself, e.g. in MVP, NONMEM control streams (`.ctl`, `.mod`) are considered equivalent to text files, and will be automatically locally parsed since there is no advantage to be gained by uploading it.
+`r "\U0001F4A1"` Whether it makes sense to parse locally is __highly dependent__ on the file itself, e.g. in MVP, NONMEM control streams (`.ctl`, `.mod`) are considered equivalent to text files, and will be automatically locally parsed since there is no advantage to be gained by uploading it.
 
 ### Automatic Retries
 
