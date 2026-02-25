@@ -82,6 +82,14 @@ more complicated models such as complex PopPK/PD, PBPK, or QSP
 models.</p>
 </div>
 <div class="section level2">
+<h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
+</h2>
+<p>By using this functionality, the user should be aware that data will
+be sent externally, and may be used for training purposes (depending on
+the provider). Please check with your organization’s policies regarding
+data privacy and data protection.</p>
+</div>
+<div class="section level2">
 <h2 id="pre-requisites">Pre-requisites<a class="anchor" aria-label="anchor" href="#pre-requisites"></a>
 </h2>
 <p>To use this feature, you <strong>must have access to API
@@ -96,9 +104,9 @@ options.</p>
 <p>Alternatively, <a href="https://openrouter.ai/models" target="_blank" class="external-link">OpenRouter</a> also has a free tier for API keys,
 although in general the free models do not perform as well as the
 frontier models, and in addition you would have to specify your exact
-model of choice to be more optimal (more on that later), so I would
-recommend shelling a few dollars to have a vastly superior
-user-experience and reserve the free option for testing purposes.</p>
+model of choice to be more optimal (more on that later), so we recommend
+spending a few dollars to have a vastly superior user-experience and
+reserve the free option for testing purposes.</p>
 </div>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
@@ -217,30 +225,37 @@ default options may become outdated and deprecated.</p>
 </h2>
 <p>From the Model Selection drop-down list, choose the option called
 “Upload File (AI Translation)”. After choosing the LLM provider that
-you’ve previously setup, all you need to do is to upload a file and then
-wait for the results to be generated, which takes about a minute. When
-the results become available, the code editor will be updated and then
-you can proceed as normal.</p>
+you’ve previously setup, all you need to do is to upload a file
+(currently supports PDF or text files <code>.txt/.mod/.ctl</code>), and
+then wait for the results to be generated, which takes about a minute.
+When the results become available, the code editor will be updated and
+then you can proceed as normal.</p>
+<p>⚠️ Multiple files are supported, as long as they have the same
+extension (e.g. all PDF files). For example, if the model descriptions
+are in the main body of the article, while the model equations and/or
+parameters are provided in the supplementary files, simply upload them
+all at the same time.</p>
 <p>💡 For better results, try <strong>limiting the file
-contents</strong> to just the relevant model descriptions. If it is a
-PDF file, you may use <a href="https://github.com/stevechoy/pdfcombiner" target="_blank" class="external-link">pdfcombiner</a> to help trim some pages off.</p>
+contents</strong> to just the relevant portions. If it is a PDF file,
+you may use <a href="https://github.com/stevechoy/pdfcombiner" target="_blank" class="external-link">pdfcombiner</a> to help trim some pages off.</p>
 <div class="section level3">
 <h3 id="locally-parsing-files">Locally Parsing Files<a class="anchor" aria-label="anchor" href="#locally-parsing-files"></a>
 </h3>
 <p>The user has the option to bypass uploading of files, and instead
 parse the text locally and include that as part of the prompt to be sent
-to LLM (currently supports PDF and text files). The advantage is that
-this is usually quicker, and with a reduced token usage (i.e. cheaper).
-The downside is that if the file contains lots of images such as model
-schematics, the contents will not be extracted and thus the response may
-become less accurate, compared to uploading the file. In addition, not
-all providers allow separate uploading of (PDF) files. If that is the
-case, MVP will automatically parse the file contents locally.</p>
+to the LLM (currently supports PDF and text files). The advantage is
+that this is usually quicker, and with a reduced token usage
+(i.e. cheaper). The downside is that if the file contains lots of images
+such as model schematics, the contents will not be extracted and thus
+the response may become less accurate, compared to uploading the file.
+In addition, not all providers allow separate uploading of (PDF) files.
+If that is the case, MVP will automatically parse the file contents
+locally.</p>
 <p>💡 Whether it makes sense to parse locally is <strong>highly
 dependent</strong> on the file itself, e.g. in MVP, NONMEM control
-streams (<code>.ctl</code>, <code>.mod</code>) are considered equivalent
-to text files, and will be automatically locally parsed since there is
-no advantage to be gained by uploading it.</p>
+streams (<code>.mod/.ctl</code>) are considered equivalent to text
+files, and will be automatically locally parsed since there is no
+advantage to be gained by uploading it.</p>
 </div>
 <div class="section level3">
 <h3 id="automatic-retries">Automatic Retries<a class="anchor" aria-label="anchor" href="#automatic-retries"></a>
@@ -249,33 +264,44 @@ no advantage to be gained by uploading it.</p>
 compilation fails. As mrgsolve syntax can be quite strict, the initial
 response may fail to compile on simple syntax errors which is often an
 easy fix.</p>
-<p>How this works behind the scenes is that the error message from
-compilation will be attached together with the original model code and
-resent to the provider, asking it to correct the mistakes. By default,
-this initiates a new conversation (i.e. no memory) so the LLM is not
-aware of the original conversation with the file contents.</p>
+<p>How this works behind the scenes is that an internal compilation
+check is performed when the initial response is received. If
+unsuccessful, the error message from the compilation will be attached
+together with the original model code and sent to the provider, asking
+it to correct the mistakes. By default, this initiates a new
+conversation (i.e. no memory) so the LLM is not aware of the original
+conversation with the file contents.</p>
 <p>💡 For better results, the user can set argument
 <code>reuse_context = TRUE</code> to keep the same conversation in order
 to provide better context to the LLM to improve the response, although
 this would incur additional token usage.</p>
 </div>
 <div class="section level3">
-<h3 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+<h3 id="cost">Cost<a class="anchor" aria-label="anchor" href="#cost"></a>
+</h3>
+<p>Typical usage assuming a 10-page PDF costs anywhere between 20k-70k
+tokens (including 2 retries), which translates to about 10-20 cents for
+a frontier model such as Claude Sonnet. If you are price conscious, you
+could consider cheaper models and/or providers. However please be aware
+that performance may be inferior for non-frontier models. In general,
+<strong>you get what you pay for</strong>.</p>
+<p>After each LLM response has been received, a notification will be
+displayed on the bottom right hand corner, which includes token usage
+for the user’s information.</p>
+</div>
+<div class="section level3">
+<h3 id="other-notes">Other Notes<a class="anchor" aria-label="anchor" href="#other-notes"></a>
 </h3>
 <ul>
 <li>The <code>prompts_path</code> argument when launching
 <code><a href="../reference/run_mvp.html">run_mvp()</a></code> allows the user to provide their own prompts. By
-default, the <code>prompts.R</code> file (located in the
-<code>/shiny</code> subfolder of <code>MVPapp</code>, whereby the path
-can be located by <code>find.package("MVPapp")</code>) is sourced in. It
+default, the included <code>prompts.R</code> file is used (located in
+the <code>/shiny</code> subfolder of <code>MVPapp</code>, whereby the
+path can be located by <code>find.package("MVPapp")</code>). The prompts
+are fine-tuned based on trial-and-error, and may change in newer
+versions to improve first-try success rates based on user feedback. It
 is recommended that users make a copy of the file before making
-adjustments.</li>
-<li>Typical usage with a 10-page PDF costs anywhere around 20-70k tokens
-(with 2 retries), which translates to about a 10-20 cents for a frontier
-model such as Claude Sonnet. If you are price conscious, you could
-consider cheaper models and/or providers. However please be aware that
-performance rapidly degrades for non-frontier models. In general,
-<strong>you get what you pay for</strong>.<br>
+adjustments.<br>
 </li>
 <li>A seed of <code>42</code> and a temperature setting of
 <code>0.1</code> is used by default. While the use of a seed or setting
@@ -296,11 +322,7 @@ set to <code>mrgsolve</code> by default. Alternatively,
 <li>If the launch argument <code>show_debugging_msg = TRUE</code>, the
 responses will be saved as the R objects <code>llm_result</code> (for
 initial translation) and <code>llm_refine</code> (for retries) in the
-global environment for review.<br>
-</li>
-<li>The prompts are fine-tuned based on trial-and-error, and may change
-in newer versions to improve first-try success rates based on user
-feedback.</li>
+global environment for review.</li>
 </ul>
 </div>
 </div>
