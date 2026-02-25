@@ -75,10 +75,11 @@ the literature to be translated and simulated in real-time with a click
 of a button!</strong></p>
 <p>With the recent advancements of generative AI, it is now possible
 (and <em>feasible</em>) to upload a file to a large language model
-(LLM), extract its relevant contents and convert it into model code.</p>
-<p>This exciting feature in MVP is potentially a huge time-saver,
-especially for more complicated models such as complex PopPK/PD, PBPK,
-or QSP models.</p>
+(LLM), extract its relevant contents and convert it into model code in
+&lt;1 minute.</p>
+<p>This feature in MVP is potentially a huge time-saver, especially for
+more complicated models such as complex PopPK/PD, PBPK, or QSP
+models.</p>
 </div>
 <div class="section level2">
 <h2 id="pre-requisites">Pre-requisites<a class="anchor" aria-label="anchor" href="#pre-requisites"></a>
@@ -105,11 +106,13 @@ user-experience and reserve the free option for testing purposes.</p>
 <p>Install the <code>ellmer</code> and the <code>pdftools</code> R
 packages if you don’t currently have it
 (<code>install.packages(c("ellmer", "pdftools")</code>). If you are not
-sure, you can check by <code>print(requireNamespace("ellmer"))</code>.
-As of 2026-Feb, most of the major providers (Claude, Gemini, OpenAI,
+sure, you can check by
+<code>print(requireNamespace(c("ellmer", "pdftools")))</code>. As of
+2026-Feb, most of the major providers (Claude, Gemini, OpenAI,
 OpenRouter) are supported in MVP, and any other providers who share the
-same API as OpenAI should also work. Please see below for a brief
-instruction of configuring API keys after package installation:</p>
+same API protocol as OpenAI should also work (by selecting the
+“OpenAI-Compatible” option). Please see below for a brief instruction of
+configuring API keys after package installation:</p>
 <ol style="list-style-type: decimal">
 <li>Open up the <code>.Renviron</code> file (if you have the
 <code>usethis</code> package, run
@@ -129,8 +132,8 @@ follows:<br>
 <li>OpenRouter: <code>OPENROUTER_API_KEY="your-key-here"</code>
 </li>
 <li>OpenAI-Compatible:
-<code>OPENAI_COMPATIBLE_API_KEY="your-key-here"</code> (includes Azure
-OpenAI, AWS Bedrock)</li>
+<code>OPENAI_COMPATIBLE_API_KEY="your-key-here"</code>
+</li>
 <li>DeepSeek: <code>DEEPSEEK_API_KEY="your-key-here"</code><br>
 </li>
 <li>Azure OpenAI: <code>AZURE_OPENAI_API_KEY="your-key-here"</code>,
@@ -176,7 +179,7 @@ the list of accepted model names.<br>
 </li>
 <li>
 <code>api_chat</code>: URL path if you are using an
-OpenAI-compatible provider, which feeds into the <code>base_url</code>
+OpenAI-Compatible provider, which feeds into the <code>base_url</code>
 argument during <code><a href="https://ellmer.tidyverse.org/reference/chat_openai_compatible.html" class="external-link">ellmer::chat_openai_compatible()</a></code> call<br>
 </li>
 <li>
@@ -197,8 +200,8 @@ it still does not guarantee reproducibility), defaults to
 <code>model_lang</code>: Output <code>mrgsolve</code> or
 <code>nonmem</code> code in the response (see below).</li>
 <li>
-<code>prompts_path</code>: Path of prompts file, by default it is in
-the installed package directory of <code>MVPapp</code> (see below).</li>
+<code>prompts_path</code>: Path of the <a href="https://github.com/stevechoy/MVPapp/blob/master/inst/shiny/prompts.R" target="_blank" class="external-link">prompts file</a>, by default it is in the installed
+package directory of <code>MVPapp</code> (see below).</li>
 </ul>
 <p>For example, if I am a Claude user and I want the results to be
 reproducible, I would launch MVP as follows:</p>
@@ -225,12 +228,14 @@ PDF file, you may use <a href="https://github.com/stevechoy/pdfcombiner" target=
 </h3>
 <p>The user has the option to bypass uploading of files, and instead
 parse the text locally and include that as part of the prompt to be sent
-to LLM. The advantage is that this is usually quicker, and with a
-reduced token usage (i.e. cheaper). The downside is that if the file
-contains lots of images such as model schematics, the contents will not
-be extracted and thus the response may become less accurate, compared to
-uploading the file.</p>
-<p>💡 Whether it makes sense to locally parse is <strong>highly
+to LLM (currently supports PDF and text files). The advantage is that
+this is usually quicker, and with a reduced token usage (i.e. cheaper).
+The downside is that if the file contains lots of images such as model
+schematics, the contents will not be extracted and thus the response may
+become less accurate, compared to uploading the file. In addition, not
+all providers allow separate uploading of (PDF) files. If that is the
+case, MVP will automatically parse the file contents locally.</p>
+<p>💡 Whether it makes sense to parse locally is <strong>highly
 dependent</strong> on the file itself, e.g. in MVP, NONMEM control
 streams (<code>.ctl</code>, <code>.mod</code>) are considered equivalent
 to text files, and will be automatically locally parsed since there is
