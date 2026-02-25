@@ -19,10 +19,10 @@ run_mvp(
   user_id_retry = "mrgsolve_translator",
   reuse_context = FALSE,
   model_gemini = "gemini-3-flash-preview",
-  model_openai = "gpt-5-mini",
+  model_openai = "gpt-5.2",
   model_anthropic = "claude-sonnet-4-6",
   model_openrouter = "arcee-ai/trinity-large-preview:free",
-  model_openai_compatible = "gpt-5-mini",
+  model_openai_compatible = "gpt-5.2",
   model_deepseek = "deepseek-reasoner",
   model_apollo = "gpt-5.2",
   model_azure = "gpt-5.2",
@@ -48,7 +48,7 @@ run_mvp(
 
 \item{pw_models_path}{Character. Default NA_character_. Provide a path to source password-gated models.}
 
-\item{llm_choices}{Vector. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible"}
+\item{llm_choices}{Character. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "Deepseek", "Azure OpenAI", "AWS Bedrock"}
 
 \item{api_upload}{Character. Default NA_character_. API upload URL when using Dify-based workflows}
 
@@ -68,7 +68,7 @@ run_mvp(
 
 \item{model_openrouter}{Character. Default arcee-ai/trinity-large-preview:free. Model for OpenRouter.}
 
-\item{model_openai_compatible}{Character. Default gpt-5-mini. Model for OpenAI-compatible providers.}
+\item{model_openai_compatible}{Character. Default gpt-5.2. Model for OpenAI-compatible providers.}
 
 \item{model_deepseek}{Character. Default deepseek-reasoner. Model for DeepSeek.}
 
@@ -103,7 +103,7 @@ to it's state prior to calling \code{run_mvp}.
 If the user wishes to run the App outside of the function (e.g. preparing for
 deployment on Posit Connect), this can be done by accessing shiny/app.R,
 which is located inside the folder of where the package was installed, and modify
-debug_mode = TRUE (and setting these options there as required).
+standalone_mode = TRUE (and setting these options there as required).
 }
 \note{
 Adapted from https://github.com/jbryer/ShinyDemo/blob/master/R/run_shiny_app.R

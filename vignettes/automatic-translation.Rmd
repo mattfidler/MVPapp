@@ -51,7 +51,7 @@ Install the `ellmer` and the `pdftools` R packages if you don't currently have i
   - `user_id`: your user name to the provider, defaults to `"mrgsolve_translator"`
   - `user_id_retry`: your user name to the provider during retries, defaults to `"mrgsolve_translator"`
   - `reuse_context`: keep the same conversation during retries to improve subsequent results, defaults to `FALSE` (see explanation below)    
-  - `model_*`: Model name to use for your preferred provider, e.g. `model_openai` for ChatGPT, or `model_anthropic` for Claude, etc. Check each provider for the list of accepted model names.  
+  - `model_*`: Model name to use for your preferred provider, e.g. `model_openai` for ChatGPT, or `model_anthropic` for Claude, etc. A default has been provided for each provider. Please check each provider for the latest list of accepted model names.  
   - `api_chat`: URL path if you are using an OpenAI-Compatible provider, which feeds into the `base_url` argument during `ellmer::chat_openai_compatible()` call  
   - `api_upload`: URL path if you are using a Dify-style provider for the upload location of files  
   - `temperature`: Temperature setting, ranging from 0 (more deterministic) to 1 (more creativity), defaults to `0.1`  
@@ -90,9 +90,9 @@ How this works behind the scenes is that the error message from compilation will
 
 + The `prompts_path` argument when launching `run_mvp()` allows the user to provide their own prompts. By default, the `prompts.R` file (located in the `/shiny` subfolder of `MVPapp`, whereby the path can be located by `find.package("MVPapp")`) is sourced in. It is recommended that users make a copy of the file before making adjustments.
 + Typical usage with a 10-page PDF costs anywhere around 20-70k tokens (with 2 retries), which translates to about a 10-20 cents for a frontier model such as Claude Sonnet. If you are price conscious, you could consider cheaper models and/or providers. However please be aware that performance rapidly degrades for non-frontier models. In general, __you get what you pay for__.  
-+ A seed of `42` and a temperature setting of `0.1` is used by default. While the use of a seed or setting a temperature to 0 does not guarantee reproducibility, during testing, I found the default value of 0.1 works OK in practice (also, many providers do not support these settings). The reason a non-zero temperature is used is because apparently the LLM can get stuck more easily with a temperature of 0, however I have not done extensive testing to confirm whether this is the case.  
++ A seed of `42` and a temperature setting of `0.1` is used by default. While the use of a seed or setting a temperature to 0 does not guarantee reproducibility, during testing, I found the default value of 0.1 works OK in practice (also, many providers do not support these settings). The reason a non-zero temperature is used is because apparently the LLM can get stuck more easily with a temperature of 0, however we have not done extensive testing to confirm whether this is the case.  
 + While the feature is currently limited to translating into mrgsolve, in principle it can be quite easily adapted to any other language. The `model_lang` argument controls the output language, which is set to `mrgsolve` by default. Alternatively, `nonmem` is also available (remember to also set Retries to 0, since MVP app does not support executing NONMEM).     
-+ If `show_debugging_msg = TRUE`, the responses will be saved as `llm_result` and `llm_refine` in the global environment for review.    
++ If the launch argument `show_debugging_msg = TRUE`, the responses will be saved as the R objects `llm_result` (for initial translation)  and `llm_refine` (for retries) in the global environment for review.    
 + The prompts are fine-tuned based on trial-and-error, and may change in newer versions to improve first-try success rates based on user feedback.  
 
 ## Performance Evaluation  

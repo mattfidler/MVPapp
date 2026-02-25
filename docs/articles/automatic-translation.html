@@ -174,8 +174,9 @@ retries to improve subsequent results, defaults to <code>FALSE</code>
 <li>
 <code>model_*</code>: Model name to use for your preferred provider,
 e.g. <code>model_openai</code> for ChatGPT, or
-<code>model_anthropic</code> for Claude, etc. Check each provider for
-the list of accepted model names.<br>
+<code>model_anthropic</code> for Claude, etc. A default has been
+provided for each provider. Please check each provider for the latest
+list of accepted model names.<br>
 </li>
 <li>
 <code>api_chat</code>: URL path if you are using an
@@ -282,7 +283,7 @@ a temperature to 0 does not guarantee reproducibility, during testing, I
 found the default value of 0.1 works OK in practice (also, many
 providers do not support these settings). The reason a non-zero
 temperature is used is because apparently the LLM can get stuck more
-easily with a temperature of 0, however I have not done extensive
+easily with a temperature of 0, however we have not done extensive
 testing to confirm whether this is the case.<br>
 </li>
 <li>While the feature is currently limited to translating into mrgsolve,
@@ -292,8 +293,9 @@ set to <code>mrgsolve</code> by default. Alternatively,
 <code>nonmem</code> is also available (remember to also set Retries to
 0, since MVP app does not support executing NONMEM).<br>
 </li>
-<li>If <code>show_debugging_msg = TRUE</code>, the responses will be
-saved as <code>llm_result</code> and <code>llm_refine</code> in the
+<li>If the launch argument <code>show_debugging_msg = TRUE</code>, the
+responses will be saved as the R objects <code>llm_result</code> (for
+initial translation) and <code>llm_refine</code> (for retries) in the
 global environment for review.<br>
 </li>
 <li>The prompts are fine-tuned based on trial-and-error, and may change
