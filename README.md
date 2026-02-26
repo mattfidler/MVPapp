@@ -38,7 +38,8 @@ target="_blank">NHANES</a>,
 target="_blank">WHO</a>, and
 <a href="https://www.cdc.gov/growthcharts/percentile_data_files.htm"
 target="_blank">CDC</a> virtual patients  
-- Custom covariate distributions to further assess variability
+- Custom covariate distributions to further assess variability  
+- Saving and restoring sessions  
 
 **The goal of MVP is to support initial model development and facilitate
 internal discussions more efficiently.**
@@ -142,6 +143,9 @@ page (e.g. dosing and axis choices).
     on the bottom right of the page. Tip: if plots take a long time to
     load, turning **off** interactive plots may help with speeding
     things up.
+8.  All settings and options (including any uploaded datasets, see
+    below) can be saved and be restored at a later time for convenience.
+    The download button is located below the code editor.
 
 ![](www/plotlytoolbar.png)
 

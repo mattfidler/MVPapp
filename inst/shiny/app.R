@@ -320,7 +320,6 @@ ui <- shiny::navbarPage(
                                                           column(width = 2,
                                                                  checkboxInput('insert_lm_eqn', insert_lm_eqn_label, value = FALSE)),
                                                           column(width = 2,
-                                                                 #checkboxInput('do_boxplot', boxplot_label, value = FALSE),
                                                                  div(style = "height: 10px;"),  # Empty div to add space
                                                                  shinyWidgets::prettySwitch('do_boxplot', label = "Box Plot", status = "warning", slim = TRUE, bigger = TRUE),
                                                                  shinyBS::bsPopover('do_boxplot', title = boxplot_label, content = bspop_do_boxplot, trigger = 'hover', placement = 'top')
@@ -336,7 +335,6 @@ ui <- shiny::navbarPage(
                                                                              selectize = FALSE),
                                                                  shinyBS::bsPopover('select_label_size',  select_label_size_label, content = bspop_select_label_size, placement = 'left', trigger = 'hover')),
                                                           column(width = 2,
-                                                                 #div(style = "height: 20px;"),  # Empty div to add space
                                                                  selectInput('quantize_x', label = quantize_x_label,
                                                                              choices = seq(0, 10, by = 1),
                                                                              selected = 0 ,
@@ -649,9 +647,37 @@ ui <- shiny::navbarPage(
                                                                                                        autoCompleters = c('rlang', 'keyword', 'snippet',
                                                                                                                           'static', 'text'),
                                                                                                        placeholder = 'Input mrgsolve format model code and run to generate the model'),
-                                                                                   downloadButton('download_cpp_model_1', 'Download Model (.cpp)'),
-                                                                                   shinyBS::bsPopover('download_cpp_model_1', 'Download Model' , content = bspop_download_cpp_model, placement = "right", trigger = "hover")
-                                                                          )
+                                                                                   
+                                                                                   tags$div(
+                                                                                     style = "display: flex; align-items: center; width: 100%; margin-top: -20px; margin-bottom: -20px;",
+                                                                                     
+                                                                                     downloadButton('download_cpp_model_1', 'Download Model (.cpp)'),
+                                                                                     shinyBS::bsPopover('download_cpp_model_1', 'Download Model', content = bspop_download_cpp_model, placement = "right", trigger = "hover"),
+                                                                                     
+                                                                                     tags$span(style = "padding: 10px;"),
+                                                                                     
+                                                                                     shiny::downloadButton('btn_save_session', label = "Save Session ", icon = icon("save")),
+                                                                                     shinyBS::bsPopover('btn_save_session', 'Save Session', content = bspop_download_session, placement = "bottom", trigger = "hover"),
+                                                                                     
+                                                                                     tags$span(style = "padding: 10px;"),
+                                                                                     
+                                                                                     # Pushes upload_session to the right
+                                                                                     tags$span(style = "margin-left: auto;"),
+                                                                                     
+                                                                                     tags$div(
+                                                                                       id    = "upload_session_wrapper",
+                                                                                       style = "margin-top: 20px; margin-bottom: -12px; display: inline-block",
+                                                                                       fileInput(
+                                                                                         "upload_session",
+                                                                                         label       = NULL,
+                                                                                         accept      = ".rds",
+                                                                                         placeholder = "Upload .rds session file",
+                                                                                         buttonLabel = "Load Session"
+                                                                                       )
+                                                                                     ),
+                                                                                     shinyBS::bsPopover('upload_session_wrapper', 'Load Session', content = bspop_upload_session, placement = "right", trigger = "hover")
+                                                                                   )
+                                                                          ) # end tabPanel
                                                       ),
                                                       shinyBS::bsPopover("bspop_model_1_info_console", title = "Model 1 Info (Console)", content = bspop_model_info_console, placement = "right", trigger = "hover"),
                                                       shinydashboard::box(width = 12,
@@ -710,8 +736,36 @@ ui <- shiny::navbarPage(
                                                                                                        autoCompleters = c('rlang', 'keyword', 'snippet',
                                                                                                                           'static', 'text'),
                                                                                                        placeholder = 'Input mrgsolve format model code and run to generate the model'),
-                                                                                   downloadButton('download_cpp_model_2', 'Download Model (.cpp)'),
-                                                                                   shinyBS::bsPopover('download_cpp_model_2', 'Download Model' , content = bspop_download_cpp_model, placement = "right", trigger = "hover")
+                                                                                   
+                                                                                   tags$div(
+                                                                                     style = "display: flex; align-items: center; width: 100%; margin-top: -20px; margin-bottom: -20px;",
+                                                                                     
+                                                                                     downloadButton('download_cpp_model_2', 'Download Model (.cpp)'),
+                                                                                     shinyBS::bsPopover('download_cpp_model_2', 'Download Model', content = bspop_download_cpp_model, placement = "right", trigger = "hover"),
+                                                                                     
+                                                                                     tags$span(style = "padding: 10px;"),
+                                                                                     
+                                                                                     shiny::downloadButton('btn_save_session_model_2', label = "Save Session ", icon = icon("save")),
+                                                                                     shinyBS::bsPopover('btn_save_session_model_2', 'Save Session', content = bspop_download_session, placement = "bottom", trigger = "hover"),
+                                                                                     
+                                                                                     tags$span(style = "padding: 10px;"),
+                                                                                     
+                                                                                     # Pushes upload_session to the right
+                                                                                     tags$span(style = "margin-left: auto;"),
+                                                                                     
+                                                                                     tags$div(
+                                                                                       id    = "upload_session_wrapper_model_2",
+                                                                                       style = "margin-top: 20px; margin-bottom: -12px; display: inline-block",
+                                                                                       fileInput(
+                                                                                         "upload_session_model_2",
+                                                                                         label       = NULL,
+                                                                                         accept      = ".rds",
+                                                                                         placeholder = "Upload .rds session file",
+                                                                                         buttonLabel = "Load Session"
+                                                                                       )
+                                                                                     ),
+                                                                                     shinyBS::bsPopover('upload_session_wrapper_model_2', 'Load Session', content = bspop_upload_session, placement = "right", trigger = "hover")
+                                                                                   )
                                                                           )
                                                       ),
                                                       shinyBS::bsPopover("bspop_model_2_info_console", title = "Model 2 Info (Console)", content = bspop_model_info_console, placement = "right", trigger = "hover"),
@@ -744,8 +798,7 @@ ui <- shiny::navbarPage(
                                                                           )
                                                       )
                                              ) # end of fluidRow
-                            ) # end of password nav_panel
-                            #}
+                            )# end of password nav_panel
                           ),                     # end of navset_pill
                           fluidRow(
                             shinydashboard::box(width = 12,
@@ -2389,7 +2442,7 @@ ui <- shiny::navbarPage(
                                title = 'Changelog', status = 'primary', solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE,
                                p('Please visit the ', a(href = "https://github.com/stevechoy/MVPapp/releases", "Github release page", target = "_blank"), ' for more information.'),
                                htmltools::br(),
-                               p('v0.4.0 (2026-02-24) - Experimental feature of parsing external files to generate mrgsolve model code. Performance improvements.'),
+                               p('v0.4.0 (2026-02-26) - Experimental feature of parsing external files to generate mrgsolve model code. Save and restore session support. Performance improvements.'),
                                p('v0.3.5 (2026-02-04) - Dose info now displays correctly for all doses in Individual Plots'),
                                p('v0.3.4 (2025-12-02) - Covariate histograms feature in Data Exploration.'),
                                p('v0.3.3 (2025-07-31) - NHANES updated to include 2021-2023. BMI filter for external databases. Minor bug fixes.'),
@@ -2445,6 +2498,72 @@ ui <- shiny::navbarPage(
 # server ----
 server <- function(input, output, session) {
   
+  # Handling save / load session states
+  
+  output$btn_save_session <- downloadHandler(
+    filename = function() {
+      paste0("mvp_session_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds")
+    },
+    content = function(file) {
+      tryCatch({
+        saveRDS(get_session_state(input, rv, uploaded_data), file)
+      }, error = function(e) {
+        showNotification(paste("Save failed:", e$message), type = "error", duration = 10)
+        saveRDS(list(error = e$message), file)  # saves something so browser doesn't hang
+      })
+    }
+  )
+  
+  output$btn_save_session_model_2 <- downloadHandler(
+    filename = function() {
+      paste0("mvp_session_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds")
+    },
+    content = function(file) {
+      tryCatch({
+        saveRDS(get_session_state(input, rv, uploaded_data), file)
+      }, error = function(e) {
+        showNotification(paste("Save failed:", e$message), type = "error", duration = 10)
+        saveRDS(list(error = e$message), file)  # saves something so browser doesn't hang
+      })
+    }
+  )
+  
+  pending_session_restore <- reactiveVal(FALSE)
+  stored_session_state    <- reactiveVal(NULL)
+  
+  observeEvent(c(input$upload_session, input$upload_session_model_2), {
+    shiny::req(!is.null(input$upload_session) | !is.null(input$upload_session_model_2))
+    
+    if(!is.null(input$upload_session)) {
+      state <- readRDS(input$upload_session$datapath)
+      shinyjs::reset("upload_session_model_2")  # clear the unused one
+    } else{
+      state <- readRDS(input$upload_session_model_2$datapath) 
+      shinyjs::reset("upload_session")  # clear the unused one
+    }
+    
+    stored_session_state(state)
+    pending_session_restore(TRUE)
+    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, show_note = TRUE)
+    
+    # Generate dataset and model AFTER a small delay to allow inputs to invalidate properly
+    shinyjs::delay(1500, {
+      shinyjs::click("eval_button")
+      shinyjs::click("generate_model")
+      shinyjs::click("generate_model2")
+    })
+  })
+  
+  # Fires once model_1_checkpoint$sim_generated_model_1 flips to TRUE, and set to low priority
+  observeEvent(c(model_1_checkpoint$sim_generated_model_1, model_2_checkpoint$sim_generated_model_2), {
+    shiny::req(pending_session_restore())
+    shiny::req(model_1_checkpoint$sim_generated_model_1 | model_2_checkpoint$sim_generated_model_2)
+    
+    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, show_note = FALSE)
+    pending_session_restore(FALSE)
+    stored_session_state(NULL)
+  }, priority = -100)
+  
   if(!is.na(authentication_code)) {
     # Function to show the authentication modal
     show_auth_modal <- function() {
@@ -2487,7 +2606,17 @@ server <- function(input, output, session) {
   shinyjs::disable("remove_pound_sign")   # Always required and not changeable by the user
   shinyjs::disable("create_cmt_col")   # Always required and not changeable by the user
   
+  uploaded_data_override <- reactiveVal(NULL)
+  
+  observeEvent(input$upload, {
+    uploaded_data_override(NULL)  # let the normal reactive take over again
+  })
+  
   uploaded_data <- reactive({
+    # Use restored data if available
+    if (!is.null(uploaded_data_override())) {
+      return(uploaded_data_override())
+    }
     shiny::req(input$upload)
     ext <- tools::file_ext(input$upload$name)
     switch(
@@ -2698,15 +2827,13 @@ server <- function(input, output, session) {
     
     unique_cmt_values <- c('NULL', unique_cmt_values)
     
-    updateSelectizeInput(session,
-                         "filter_cmt",
-                         choices = unique_cmt_values,
-                         selected = 'NULL')
-    
-    updateSelectizeInput(session,
-                         "filter_cmt_data",
-                         choices = unique_cmt_values,
-                         selected = 'NULL')
+    if(isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "filter_cmt", choices = unique_cmt_values)
+      updateSelectizeInput(session, "filter_cmt_data", choices = unique_cmt_values)      
+    } else {
+      updateSelectizeInput(session, "filter_cmt", choices = unique_cmt_values, selected = 'NULL')
+      updateSelectizeInput(session, "filter_cmt_data", choices = unique_cmt_values, selected = 'NULL')      
+    }
   }, label = 'Update selectizeInput nmdata() filtered CMT')
   
   output$console_data_1 <- renderPrint({
@@ -2767,187 +2894,212 @@ server <- function(input, output, session) {
   
   ### Update variables for inputted_file ----
   observeEvent(nmdataset_for_plot(), {
-    #if(final_output_executed()) {
-    if (show_debugging_msg) {
-      message('Attempting to update default variables for nmdataset_for_plot()')
-    }
-    
-    updateSelectizeInput(session,
-                         "x_axis",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("TIME" %in% names(nmdataset_for_plot()) ~ "TIME",
-                                                     "TAFD" %in% names(nmdataset_for_plot()) ~ "TAFD",
-                                                     "ATFD" %in% names(nmdataset_for_plot()) ~ "ATFD",
-                                                     "TSFD" %in% names(nmdataset_for_plot()) ~ "TSFD",
-                                                     "TSLD" %in% names(nmdataset_for_plot()) ~ "TSLD",
-                                                     "ARELTMSL" %in% names(nmdataset_for_plot()) ~ "ARELTMSL",
-                                                     "ARTMSLR" %in% names(nmdataset_for_plot()) ~ "ARTMSLR",
-                                                     "ARELTMEL" %in% names(nmdataset_for_plot()) ~ "ARELTMEL",
-                                                     TRUE                                        ~ "")
-    )
-    
-    updateSelectizeInput(session,
-                         "y_axis",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("DV" %in% names(nmdataset_for_plot()) ~ "DV",
-                                                     #"AVAL" %in% names(nmdataset_for_plot()) ~ "AVAL",
-                                                     #"AVALREP" %in% names(nmdataset_for_plot()) ~ "AVALREP",
-                                                     #"ACVALREP" %in% names(nmdataset_for_plot()) ~ "ACVALREP",
-                                                     TRUE                                        ~ "")
-    )
-    
-    updateSelectizeInput(session,
-                         "color",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = '')
-    
-    updateSelectizeInput(session,
-                         "median_line_by",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = '')
-    
-    updateSelectizeInput(session,
-                         "var_corr",
-                         choices = names(nmdataset_for_plot()) %>% sort())
-    
-    updateSelectizeInput(session,
-                         "var_hist",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = NULL)
-    
-    updateSelectizeInput(session,
-                         "facet_by",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = NULL)
-    
-    updateSelectizeInput(session,
-                         "color_corr",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
-                                                     "DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
-                                                     "AROUTE" %in% names(nmdataset_for_plot()) ~ "AROUTE",
-                                                     "ATRT" %in% names(nmdataset_for_plot()) ~ "ATRT",
-                                                     TRUE  ~ ''
-                         )
-    )
-    
-    ## Update selections for NCA
-    updateSelectizeInput(session,
-                         "subject_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("SUBJID" %in% names(nmdataset_for_plot()) ~ "SUBJID",
-                                                     "SUBJIDN" %in% names(nmdataset_for_plot()) ~ "SUBJIDN",
-                                                     "ID" %in% names(nmdataset_for_plot()) ~ "ID",
-                                                     "USUBJID" %in% names(nmdataset_for_plot()) ~ "USUBJID")
-    )
-    
-    updateSelectizeInput(session,
-                         "time_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("ARELTMSL" %in% names(nmdataset_for_plot()) ~ "ARELTMSL",
-                                                     "TIME" %in% names(nmdataset_for_plot()) ~ "TIME",
-                                                     "TAFD" %in% names(nmdataset_for_plot()) ~ "TAFD",
-                                                     "ATFD" %in% names(nmdataset_for_plot()) ~ "ATFD",
-                                                     "TSFD" %in% names(nmdataset_for_plot()) ~ "TSFD",
-                                                     "TSLD" %in% names(nmdataset_for_plot()) ~ "TSLD",
-                                                     "ARTMSLR" %in% names(nmdataset_for_plot()) ~ "ARTMSLR",
-                                                     "ARELTMEL" %in% names(nmdataset_for_plot()) ~ "ARELTMEL")
-    )
-    
-    updateSelectizeInput(session,
-                         "conc_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("AVALREP" %in% names(nmdataset_for_plot()) ~ "AVALREP",
-                                                     "ACVALREP" %in% names(nmdataset_for_plot()) ~ "ACVALREP",
-                                                     "DV" %in% names(nmdataset_for_plot()) ~ "DV",
-                                                     "AVAL" %in% names(nmdataset_for_plot()) ~ "AVAL")
-    )
-    
-    updateSelectizeInput(session,
-                         "dose_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
-                                                     "DOSEP" %in% names(nmdataset_for_plot()) ~ "DOSEP",
-                                                     "DOSEAM" %in% names(nmdataset_for_plot()) ~ "DOSEAM",
-                                                     "DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE")
-    )
-    
-    updateSelectizeInput(session,
-                         "additional_keys",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("ATRTCD" %in% names(nmdataset_for_plot()) ~ "ATRTCD",
-                                                     "ATRT" %in% names(nmdataset_for_plot()) ~ "ATRT",
-                                                     "DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
-                                                     "DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
-                                                     "DOSEMG" %in% names(nmdataset_for_plot()) ~ "DOSEMG",
-                                                     #"AMT" %in% names(nmdataset_for_plot()) ~ "AMT",
-                                                     TRUE ~ "DUMMY")
-    )
-    
-    if('ID' %in% names(nmdataset_for_plot())) {
+    if (isolate(pending_session_restore())) {
+      # Only update choices, preserve selected
+      updateSelectizeInput(session, "x_axis",        choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "y_axis",        choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "color",         choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "median_line_by",choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "color_corr",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "subject_colname", choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "time_colname",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "conc_colname",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "dose_colname",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "additional_keys", choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "sort_by_ind",     choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "strat_by_ind",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "highlight_var",   choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "ind_dose_colname",choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "lloq_colname",    choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "facet_by",        choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "var_corr",        choices = names(nmdataset_for_plot()) %>% sort())
+      updateSelectizeInput(session, "var_hist",        choices = names(nmdataset_for_plot()) %>% sort())
+      if ('ID' %in% names(nmdataset_for_plot())) {
+        updateSelectizeInput(session, "filter_by_id", choices = unique(nmdataset_for_plot()$ID), server = TRUE)
+      }
+    } else {
+      if (show_debugging_msg) {
+        message('Attempting to update default variables for nmdataset_for_plot()')
+      }
+      
       updateSelectizeInput(session,
-                           "filter_by_id",
-                           choices = unique(nmdataset_for_plot()$ID),
-                           selected = NULL,
-                           server = TRUE
+                           "x_axis",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("TIME" %in% names(nmdataset_for_plot()) ~ "TIME",
+                                                       "TAFD" %in% names(nmdataset_for_plot()) ~ "TAFD",
+                                                       "ATFD" %in% names(nmdataset_for_plot()) ~ "ATFD",
+                                                       "TSFD" %in% names(nmdataset_for_plot()) ~ "TSFD",
+                                                       "TSLD" %in% names(nmdataset_for_plot()) ~ "TSLD",
+                                                       "ARELTMSL" %in% names(nmdataset_for_plot()) ~ "ARELTMSL",
+                                                       "ARTMSLR" %in% names(nmdataset_for_plot()) ~ "ARTMSLR",
+                                                       "ARELTMEL" %in% names(nmdataset_for_plot()) ~ "ARELTMEL",
+                                                       TRUE                                        ~ "")
       )
+      
+      updateSelectizeInput(session,
+                           "y_axis",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("DV" %in% names(nmdataset_for_plot()) ~ "DV",
+                                                       #"AVAL" %in% names(nmdataset_for_plot()) ~ "AVAL",
+                                                       #"AVALREP" %in% names(nmdataset_for_plot()) ~ "AVALREP",
+                                                       #"ACVALREP" %in% names(nmdataset_for_plot()) ~ "ACVALREP",
+                                                       TRUE                                        ~ "")
+      )
+      
+      updateSelectizeInput(session,
+                           "color",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = '')
+      
+      updateSelectizeInput(session,
+                           "median_line_by",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = '')
+      
+      updateSelectizeInput(session,
+                           "var_corr",
+                           choices = names(nmdataset_for_plot()) %>% sort())
+      
+      updateSelectizeInput(session,
+                           "var_hist",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = NULL)
+      
+      updateSelectizeInput(session,
+                           "facet_by",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = NULL)
+      
+      updateSelectizeInput(session,
+                           "color_corr",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
+                                                       "DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
+                                                       "AROUTE" %in% names(nmdataset_for_plot()) ~ "AROUTE",
+                                                       "ATRT" %in% names(nmdataset_for_plot()) ~ "ATRT",
+                                                       TRUE  ~ ''
+                           )
+      )
+      
+      ## Update selections for NCA
+      updateSelectizeInput(session,
+                           "subject_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("SUBJID" %in% names(nmdataset_for_plot()) ~ "SUBJID",
+                                                       "SUBJIDN" %in% names(nmdataset_for_plot()) ~ "SUBJIDN",
+                                                       "ID" %in% names(nmdataset_for_plot()) ~ "ID",
+                                                       "USUBJID" %in% names(nmdataset_for_plot()) ~ "USUBJID")
+      )
+      
+      updateSelectizeInput(session,
+                           "time_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("ARELTMSL" %in% names(nmdataset_for_plot()) ~ "ARELTMSL",
+                                                       "TIME" %in% names(nmdataset_for_plot()) ~ "TIME",
+                                                       "TAFD" %in% names(nmdataset_for_plot()) ~ "TAFD",
+                                                       "ATFD" %in% names(nmdataset_for_plot()) ~ "ATFD",
+                                                       "TSFD" %in% names(nmdataset_for_plot()) ~ "TSFD",
+                                                       "TSLD" %in% names(nmdataset_for_plot()) ~ "TSLD",
+                                                       "ARTMSLR" %in% names(nmdataset_for_plot()) ~ "ARTMSLR",
+                                                       "ARELTMEL" %in% names(nmdataset_for_plot()) ~ "ARELTMEL")
+      )
+      
+      updateSelectizeInput(session,
+                           "conc_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("AVALREP" %in% names(nmdataset_for_plot()) ~ "AVALREP",
+                                                       "ACVALREP" %in% names(nmdataset_for_plot()) ~ "ACVALREP",
+                                                       "DV" %in% names(nmdataset_for_plot()) ~ "DV",
+                                                       "AVAL" %in% names(nmdataset_for_plot()) ~ "AVAL")
+      )
+      
+      updateSelectizeInput(session,
+                           "dose_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
+                                                       "DOSEP" %in% names(nmdataset_for_plot()) ~ "DOSEP",
+                                                       "DOSEAM" %in% names(nmdataset_for_plot()) ~ "DOSEAM",
+                                                       "DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE")
+      )
+      
+      updateSelectizeInput(session,
+                           "additional_keys",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("ATRTCD" %in% names(nmdataset_for_plot()) ~ "ATRTCD",
+                                                       "ATRT" %in% names(nmdataset_for_plot()) ~ "ATRT",
+                                                       "DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
+                                                       "DOSEA" %in% names(nmdataset_for_plot()) ~ "DOSEA",
+                                                       "DOSEMG" %in% names(nmdataset_for_plot()) ~ "DOSEMG",
+                                                       #"AMT" %in% names(nmdataset_for_plot()) ~ "AMT",
+                                                       TRUE ~ "DUMMY")
+      )
+      
+      if('ID' %in% names(nmdataset_for_plot())) {
+        updateSelectizeInput(session,
+                             "filter_by_id",
+                             choices = unique(nmdataset_for_plot()$ID),
+                             selected = NULL,
+                             server = TRUE
+        )
+      }
+      
+      updateSelectizeInput(session,
+                           "sort_by_ind",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = NULL
+      )
+      
+      updateSelectizeInput(session,
+                           "strat_by_ind",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = ''
+      )
+      
+      updateSelectizeInput(session,
+                           "highlight_var",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = ''
+      )
+      
+      updateSelectizeInput(session,
+                           "ind_dose_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
+                                                       "DOSEMG" %in% names(nmdataset_for_plot()) ~ "DOSEMG",
+                                                       "AMT" %in% names(nmdataset_for_plot()) ~ "AMT",
+                                                       "AMTNM" %in% names(nmdataset_for_plot()) ~ "AMT",
+                                                       TRUE                                        ~ "")
+      )
+      
+      updateSelectizeInput(session,
+                           "lloq_colname",
+                           choices = names(nmdataset_for_plot()) %>% sort(),
+                           selected = dplyr::case_when("LLOQ" %in% names(nmdataset_for_plot()) ~ "LLOQ",
+                                                       TRUE                                        ~ "")
+      )
+      
     }
-    
-    updateSelectizeInput(session,
-                         "sort_by_ind",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = NULL
-    )
-    
-    updateSelectizeInput(session,
-                         "strat_by_ind",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = ''
-    )
-    
-    updateSelectizeInput(session,
-                         "highlight_var",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = ''
-    )
-    
-    updateSelectizeInput(session,
-                         "ind_dose_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("DOSE" %in% names(nmdataset_for_plot()) ~ "DOSE",
-                                                     "DOSEMG" %in% names(nmdataset_for_plot()) ~ "DOSEMG",
-                                                     "AMT" %in% names(nmdataset_for_plot()) ~ "AMT",
-                                                     "AMTNM" %in% names(nmdataset_for_plot()) ~ "AMT",
-                                                     TRUE                                        ~ "")
-    )
-    
-    updateSelectizeInput(session,
-                         "lloq_colname",
-                         choices = names(nmdataset_for_plot()) %>% sort(),
-                         selected = dplyr::case_when("LLOQ" %in% names(nmdataset_for_plot()) ~ "LLOQ",
-                                                     TRUE                                        ~ "")
-    )
-    
-    #}
   }, label = 'Update selectizeInput after uploaded_data()')
   
   observeEvent(c(nmdataset_for_plot(), input$number_of_rows, input$number_of_cols), {
-    if('ID' %in% names(nmdataset_for_plot())) {
-      updateSelectizeInput(session,
-                           "page_number",
-                           choices = 1:(ceiling(length(unique(nmdataset_for_plot()$ID)) / (as.numeric(input$number_of_rows) * as.numeric(input$number_of_cols)))),
-                           selected = 1
-      )
-    }
-  }, label = 'Update page_number')
+    if (!isolate(pending_session_restore())) {
+      if ('ID' %in% names(nmdataset_for_plot())) {
+        updateSelectizeInput(session, "page_number",
+                             choices = 1:(ceiling(length(unique(nmdataset_for_plot()$ID)) / (as.numeric(input$number_of_rows) * as.numeric(input$number_of_cols)))),
+                             selected = 1)
+      }
+    } 
+  }, label = 'Update page_number')  
   
   observeEvent(c(nmdataset_for_plot(), input$highlight_var), {
     if(!is.null(input$highlight_var) && input$highlight_var != '') {
-      updateSelectizeInput(session,
-                           "highlight_var_values",
-                           choices = unique(nmdataset_for_plot()[[input$highlight_var]]) %>% sort(),
-                           selected = ''
-      )
+      if (!isolate(pending_session_restore())) {
+        updateSelectizeInput(session,
+                             "highlight_var_values",
+                             choices = unique(nmdataset_for_plot()[[input$highlight_var]]) %>% sort(),
+                             selected = ''
+        )
+      }
     }
   }, label = 'Update highlight_var_values')
   
@@ -4398,48 +4550,58 @@ server <- function(input, output, session) {
   
   ### Update cmt from the model ----
   observeEvent(inputted_model_1(), {
-    # Automatically handle D_ and R_ if present
-    if (any(stringr::str_starts(inputted_model_1()$code, "D_"))) {
-      updateCheckboxInput(session, "model_dur_checkbox", value = TRUE)
-      shiny::showNotification("Duration syntax (D_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+    if (isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "yaxis_name",    choices = c(mrgsolve::outvars(inputted_model_1())$capture, mrgsolve::outvars(inputted_model_1())$cmt))
+      updateSelectizeInput(session, "tor_var_model_1", choices = c(mrgsolve::outvars(inputted_model_1())$capture, mrgsolve::outvars(inputted_model_1())$cmt))
+      updateSelectizeInput(session, "cmt1_model_1", choices = mrgsolve::outvars(inputted_model_1())$cmt)
+      updateSelectizeInput(session, "cmt2_model_1", choices = mrgsolve::outvars(inputted_model_1())$cmt)
+      updateSelectizeInput(session, "cmt3_model_1", choices = mrgsolve::outvars(inputted_model_1())$cmt)
+      updateSelectizeInput(session, "cmt4_model_1", choices = mrgsolve::outvars(inputted_model_1())$cmt)
+      updateSelectizeInput(session, "cmt5_model_1", choices = mrgsolve::outvars(inputted_model_1())$cmt)
     } else {
-      updateCheckboxInput(session, "model_dur_checkbox", value = FALSE)
-    }
-    
-    if (any(stringr::str_starts(inputted_model_1()$code, "R_") &
-            !stringr::str_starts(inputted_model_1()$code, "R_tot"))) {
-      updateCheckboxInput(session, "model_rate_checkbox", value = TRUE)
-      shiny::showNotification("Rate syntax (R_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
-    } else {
-      updateCheckboxInput(session, "model_rate_checkbox", value = FALSE)
-    }
-    
-    if(model_1_is_valid()) {
-      updateSelectizeInput(session,
-                           "cmt1_model_1",
-                           choices  = mrgsolve::outvars(inputted_model_1())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+      # Automatically handle D_ and R_ if present
+      if (any(stringr::str_starts(inputted_model_1()$code, "D_"))) {
+        updateCheckboxInput(session, "model_dur_checkbox", value = TRUE)
+        shiny::showNotification("Duration syntax (D_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+      } else {
+        updateCheckboxInput(session, "model_dur_checkbox", value = FALSE)
+      }
       
-      updateSelectizeInput(session,
-                           "cmt2_model_1",
-                           choices  = mrgsolve::outvars(inputted_model_1())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+      if (any(stringr::str_starts(inputted_model_1()$code, "R_") &
+              !stringr::str_starts(inputted_model_1()$code, "R_tot"))) {
+        updateCheckboxInput(session, "model_rate_checkbox", value = TRUE)
+        shiny::showNotification("Rate syntax (R_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+      } else {
+        updateCheckboxInput(session, "model_rate_checkbox", value = FALSE)
+      }
       
-      updateSelectizeInput(session,
-                           "cmt3_model_1",
-                           choices  = mrgsolve::outvars(inputted_model_1())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
-      
-      updateSelectizeInput(session,
-                           "cmt4_model_1",
-                           choices  = mrgsolve::outvars(inputted_model_1())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
-      
-      updateSelectizeInput(session,
-                           "cmt5_model_1",
-                           choices  = mrgsolve::outvars(inputted_model_1())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
-      
+      if(model_1_is_valid()) {
+        updateSelectizeInput(session,
+                             "cmt1_model_1",
+                             choices  = mrgsolve::outvars(inputted_model_1())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt2_model_1",
+                             choices  = mrgsolve::outvars(inputted_model_1())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt3_model_1",
+                             choices  = mrgsolve::outvars(inputted_model_1())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt4_model_1",
+                             choices  = mrgsolve::outvars(inputted_model_1())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt5_model_1",
+                             choices  = mrgsolve::outvars(inputted_model_1())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_1())$cmt[1])
+        
+      }
     }
   }, label = 'update simulation CMT dosing_regimen_model_1')
   
@@ -4769,47 +4931,57 @@ server <- function(input, output, session) {
   
   ### Update cmt from the model ----
   observeEvent(inputted_model_2(), {
-    # Automatically handle D_ and R_ if present
-    if (any(stringr::str_starts(inputted_model_2()$code, "D_"))) {
-      updateCheckboxInput(session, "model_dur_checkbox_2", value = TRUE)
-      shiny::showNotification("Duration syntax (D_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+    if (isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "yaxis_name_model_2",    choices = c(mrgsolve::outvars(inputted_model_2())$capture, mrgsolve::outvars(inputted_model_2())$cmt))
+      updateSelectizeInput(session, "tor_var_model_2", choices = c(mrgsolve::outvars(inputted_model_2())$capture, mrgsolve::outvars(inputted_model_2())$cmt))
+      updateSelectizeInput(session, "cmt1_model_2", choices = mrgsolve::outvars(inputted_model_2())$cmt)
+      updateSelectizeInput(session, "cmt2_model_2", choices = mrgsolve::outvars(inputted_model_2())$cmt)
+      updateSelectizeInput(session, "cmt3_model_2", choices = mrgsolve::outvars(inputted_model_2())$cmt)
+      updateSelectizeInput(session, "cmt4_model_2", choices = mrgsolve::outvars(inputted_model_2())$cmt)
+      updateSelectizeInput(session, "cmt5_model_2", choices = mrgsolve::outvars(inputted_model_2())$cmt)
     } else {
-      updateCheckboxInput(session, "model_dur_checkbox_2", value = FALSE)
-    }
-    
-    if (any(stringr::str_starts(inputted_model_2()$code, "R_") &
-            !stringr::str_starts(inputted_model_2()$code, "R_tot"))) {
-      updateCheckboxInput(session, "model_rate_checkbox_2", value = TRUE)
-      shiny::showNotification("Rate syntax (R_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
-    } else {
-      updateCheckboxInput(session, "model_rate_checkbox_2", value = FALSE)
-    }
-    
-    if(model_2_is_valid()) {
-      updateSelectizeInput(session,
-                           "cmt1_model_2",
-                           choices  = mrgsolve::outvars(inputted_model_2())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+      # Automatically handle D_ and R_ if present
+      if (any(stringr::str_starts(inputted_model_2()$code, "D_"))) {
+        updateCheckboxInput(session, "model_dur_checkbox_2", value = TRUE)
+        shiny::showNotification("Duration syntax (D_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+      } else {
+        updateCheckboxInput(session, "model_dur_checkbox_2", value = FALSE)
+      }
       
-      updateSelectizeInput(session,
-                           "cmt2_model_2",
-                           choices  = mrgsolve::outvars(inputted_model_2())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+      if (any(stringr::str_starts(inputted_model_2()$code, "R_") &
+              !stringr::str_starts(inputted_model_2()$code, "R_tot"))) {
+        updateCheckboxInput(session, "model_rate_checkbox_2", value = TRUE)
+        shiny::showNotification("Rate syntax (R_xxx) detected in the model code and will be modeled by default.", type = "message", duration = 10)
+      } else {
+        updateCheckboxInput(session, "model_rate_checkbox_2", value = FALSE)
+      }
       
-      updateSelectizeInput(session,
-                           "cmt3_model_2",
-                           choices  = mrgsolve::outvars(inputted_model_2())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
-      
-      updateSelectizeInput(session,
-                           "cmt4_model_2",
-                           choices  = mrgsolve::outvars(inputted_model_2())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
-      
-      updateSelectizeInput(session,
-                           "cmt5_model_2",
-                           choices  = mrgsolve::outvars(inputted_model_2())$cmt,
-                           selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+      if(model_2_is_valid()) {
+        updateSelectizeInput(session,
+                             "cmt1_model_2",
+                             choices  = mrgsolve::outvars(inputted_model_2())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt2_model_2",
+                             choices  = mrgsolve::outvars(inputted_model_2())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt3_model_2",
+                             choices  = mrgsolve::outvars(inputted_model_2())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt4_model_2",
+                             choices  = mrgsolve::outvars(inputted_model_2())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+        
+        updateSelectizeInput(session,
+                             "cmt5_model_2",
+                             choices  = mrgsolve::outvars(inputted_model_2())$cmt,
+                             selected = mrgsolve::outvars(inputted_model_2())$cmt[1])
+      }
     }
   }, label = 'update simulation CMT dosing_regimen_model_2')
   
@@ -5064,17 +5236,22 @@ server <- function(input, output, session) {
   }, label = 'update_y_axis_name_2')
   
   observeEvent(nmdata_cmt_filtered(), {
-    updateSelectizeInput(session,
-                         "nonmem_y_axis",
-                         choices = names(nmdata_cmt_filtered()) %>% sort(),
-                         selected = 'DV')
+    if (isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "nonmem_y_axis", choices = names(nmdata_cmt_filtered()) %>% sort())
+    } else {
+      updateSelectizeInput(session, "nonmem_y_axis", choices = names(nmdata_cmt_filtered()) %>% sort(), selected = 'DV')
+    }
   }, label = 'update_nonmem_y_axis')
   
   observeEvent(nmdata_cmt_filtered(), {
-    updateSelectizeInput(session,
-                         "color_data_by",
-                         choices = names(nmdata_cmt_filtered()) %>% sort(),
-                         selected = NA)
+    if (isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "color_data_by",
+                           choices = names(nmdata_cmt_filtered()) %>% sort())
+    } else {
+      updateSelectizeInput(session, "color_data_by",
+                           choices  = names(nmdata_cmt_filtered()) %>% sort(),
+                           selected = NA)
+    }
   }, label = 'update_color_data_by')
   
   observeEvent(c(nmdata_cmt_filtered(), input$color_data_by), {
@@ -5292,12 +5469,23 @@ server <- function(input, output, session) {
     time_max     <- max(times_sorted)
     
     for (id in c('min_nca_obs_time_model_1', 'min_tor_obs_time_model_1')) {
-      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                      choices = times_sorted, selected = time_min)
+      if(isolate(pending_session_restore())) {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted)        
+      } else {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted, selected = time_min)        
+      }
     }
+    
     for (id in c('max_nca_obs_time_model_1', 'max_tor_obs_time_model_1')) {
-      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                      choices = times_sorted, selected = time_max)
+      if(isolate(pending_session_restore())) {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted)        
+      } else {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted, selected = time_max)        
+      }
     }
   }, label = 'update model_1 time selection')
   
@@ -5604,12 +5792,23 @@ server <- function(input, output, session) {
     time_max     <- max(times_sorted)
     
     for (id in c('min_nca_obs_time_model_2', 'min_tor_obs_time_model_2')) {
-      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                      choices = times_sorted, selected = time_min)
+      if(isolate(pending_session_restore())) {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted)        
+      } else {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted, selected = time_min)        
+      }
     }
+    
     for (id in c('max_nca_obs_time_model_2', 'max_tor_obs_time_model_2')) {
-      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                      choices = times_sorted, selected = time_max)
+      if(isolate(pending_session_restore())) {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted)        
+      } else {
+        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                        choices = times_sorted, selected = time_max)        
+      }
     }
   }, label = 'update model_2 time selection')
   
@@ -5956,6 +6155,9 @@ server <- function(input, output, session) {
   
   observeEvent(c(changed_reacted_param_model_1(), input$tor_fix_model_1), {
     shiny::req(model_1_is_valid())
+    shiny::req(mrgsolve::is.mrgmod(changed_reacted_param_model_1()))
+    shiny::req(length(mrgsolve::param(changed_reacted_param_model_1())) > 0)  # guard empty params
+    
     tmp <- extract_model_params(changed_reacted_param_model_1()) %>%
       dplyr::rename(Name = name, Reference = value)
     
@@ -6288,6 +6490,9 @@ server <- function(input, output, session) {
   
   observeEvent(c(changed_reacted_param_model_2(), input$tor_fix_model_2), {
     shiny::req(model_2_is_valid())
+    shiny::req(mrgsolve::is.mrgmod(changed_reacted_param_model_2()))
+    shiny::req(length(mrgsolve::param(changed_reacted_param_model_2())) > 0)  # guard empty params
+    
     tmp <- extract_model_params(changed_reacted_param_model_2()) %>%
       dplyr::rename(Name = name, Reference = value)
     
@@ -8258,12 +8463,20 @@ server <- function(input, output, session) {
   
   ### UI: output$proportion_above_threshold ----
   observeEvent(sampling_options(), {
-    shinyWidgets::updatePickerInput(session,
-                                    inputId = 'x_value_threshold',
-                                    label = NULL,
-                                    choices = sort(unique(sampling_options())),
-                                    select = dplyr::last(unique(sampling_options()))
-    )
+    if(isolate(pending_session_restore())) {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'x_value_threshold',
+                                      label = NULL,
+                                      choices = sort(unique(sampling_options()))
+      )         
+    } else {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'x_value_threshold',
+                                      label = NULL,
+                                      choices = sort(unique(sampling_options())),
+                                      select = dplyr::last(unique(sampling_options()))
+      )      
+    }
   }, label = 'update x value selection proportion')
   
   pct_above_y_at_x_model_1 <- reactive({
@@ -8323,19 +8536,33 @@ server <- function(input, output, session) {
   ### Update input$exp_time_range ----
   observe({
     (shiny::req(simulation_output_model_1()))
-    shinyWidgets::updatePickerInput(session,
-                                    inputId = 'min_exp_obs_time_model',
-                                    label = NULL,
-                                    choices = sort(unique(simulation_output_model_1()$TIME)),
-                                    select = min(unique(simulation_output_model_1()$TIME))
-    )
+    if(isolate(pending_session_restore())) {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'min_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_1()$TIME)))      
+    } else {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'min_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_1()$TIME)),
+                                      select = min(unique(simulation_output_model_1()$TIME))
+      )
+    }
     
-    shinyWidgets::updatePickerInput(session,
-                                    inputId = 'max_exp_obs_time_model',
-                                    label = NULL,
-                                    choices = sort(unique(simulation_output_model_1()$TIME)),
-                                    select = max(unique(simulation_output_model_1()$TIME))
-    )
+    if(isolate(pending_session_restore())) {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'max_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_1()$TIME))) 
+    } else {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'max_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_1()$TIME)),
+                                      select = max(unique(simulation_output_model_1()$TIME))
+      )
+    }
   }, label = 'update exp time selection')
   
   observeEvent(input$min_exp_obs_time_model, {
@@ -8359,19 +8586,33 @@ server <- function(input, output, session) {
   # Model 2
   observe({
     (shiny::req(simulation_output_model_2()))
-    shinyWidgets::updatePickerInput(session,
-                                    inputId = 'min_exp_obs_time_model',
-                                    label = NULL,
-                                    choices = sort(unique(simulation_output_model_2()$TIME)),
-                                    select = min(unique(simulation_output_model_2()$TIME))
-    )
+    if(isolate(pending_session_restore())) {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'min_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_2()$TIME)))      
+    } else {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'min_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_2()$TIME)),
+                                      select = min(unique(simulation_output_model_2()$TIME))
+      )
+    }
     
-    shinyWidgets::updatePickerInput(session,
-                                    inputId = 'max_exp_obs_time_model',
-                                    label = NULL,
-                                    choices = sort(unique(simulation_output_model_2()$TIME)),
-                                    select = max(unique(simulation_output_model_2()$TIME))
-    )
+    if(isolate(pending_session_restore())) {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'max_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_2()$TIME))) 
+    } else {
+      shinyWidgets::updatePickerInput(session,
+                                      inputId = 'max_exp_obs_time_model',
+                                      label = NULL,
+                                      choices = sort(unique(simulation_output_model_2()$TIME)),
+                                      select = max(unique(simulation_output_model_2()$TIME))
+      )
+    }
   }, label = 'update exp time selection model 2')
   
   observeEvent(input$min_exp_obs_time_model, {

@@ -52,6 +52,7 @@
 <url><loc>https://stevechoy.github.io/MVPapp/reference/get_apollo_token.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/get_apollo_token_ext.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/get_bin_times.html</loc></url>
+<url><loc>https://stevechoy.github.io/MVPapp/reference/get_session_state.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/gm_mean.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/gm_mean_cv.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/handle_blanks.html</loc></url>
@@ -87,6 +88,7 @@
 <url><loc>https://stevechoy.github.io/MVPapp/reference/quantize.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/reconstruct_matrices.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/refine_model_code.html</loc></url>
+<url><loc>https://stevechoy.github.io/MVPapp/reference/restore_session_state.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/run_dify_chat.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/run_ellmer_chat.html</loc></url>
 <url><loc>https://stevechoy.github.io/MVPapp/reference/run_mvp.html</loc></url>

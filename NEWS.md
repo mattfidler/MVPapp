@@ -1,8 +1,9 @@
-# MVPapp 0.4.0 (2026-02-19)
+# MVPapp 0.4.0 (2026-02-26)
 
 ## Features
 
-* Experimental feature of automatic model translation using LLMs. (#4)  
+* Automatic model translation using LLMs (#4)  
+* Supports Saving / Loading sessions (#5)
 
 ## Bugfixes
 

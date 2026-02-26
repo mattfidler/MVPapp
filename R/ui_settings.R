@@ -233,6 +233,10 @@ bspop_password_github <- 'Please visit the <a href="https://github.com/Boehringe
 #' @export
 bspop_generate_model  <- "Please wait a few seconds after selecting models or editing code before clicking the Generate Model button."
 #' @export
+bspop_download_session <- "Download session settings as .rds file.<br><br>Note: Real-time changes to parameter values will not be recorded, i.e. the parameters will be saved according to what has been defined in the code editor."
+#' @export
+bspop_upload_session  <- "Restore previous session settings (.rds file). Please wait a few seconds during restoration.<br><br>If you used both models, please also navigate to the other model tab after restoring settings to have it re-populated."
+#' @export
 label_dose            <- 'Dose Amount'
 #' @export
 bspop_dose            <- 'Dose Amount is intentionally unitless, as the user has the flexibility to adjust the Y-axis label option in "Plotting Options".<br><br> For dosing in molecular weight or weight-based dosing, navigate to the Transform Dose tab.'
