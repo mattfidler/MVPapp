@@ -657,7 +657,7 @@ ui <- shiny::navbarPage(
                                                                                      tags$span(style = "padding: 10px;"),
                                                                                      
                                                                                      shiny::downloadButton('btn_save_session', label = "Save Session ", icon = icon("save")),
-                                                                                     shinyBS::bsPopover('btn_save_session', 'Save Session', content = bspop_download_session, placement = "bottom", trigger = "hover"),
+                                                                                     shinyBS::bsPopover('btn_save_session', 'Save Session', content = bspop_download_session, placement = "right", trigger = "hover"),
                                                                                      
                                                                                      tags$span(style = "padding: 10px;"),
                                                                                      
