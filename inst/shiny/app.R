@@ -2503,7 +2503,7 @@ server <- function(input, output, session) {
     ggplot2_version <- utils::packageVersion("ggplot2")
     plotly_version  <- utils::packageVersion("plotly")
     
-    if (ggplot2_version >= "4.0.0" && plotly_version <= "4.11.0") {
+    if (ggplot2_version >= "4.0.0" && plotly_version < "4.11.0") {
       
       plotly_incompatible_inputs <- c(
         "do_data_plotly",
