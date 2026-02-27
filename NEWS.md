@@ -7,7 +7,8 @@
 
 ## Bugfixes
 
-* Minor bugfixes and general performance improvements. (#3)  
+* Minor bugfixes and general performance improvements. (#3) 
+* Plotly compatibility check with ggplot2 >=4.0.0 (#6)
 
 # MVPapp 0.3.5 (2026-02-04)
 

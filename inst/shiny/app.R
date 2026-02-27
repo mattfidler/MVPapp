@@ -2498,6 +2498,40 @@ ui <- shiny::navbarPage(
 # server ----
 server <- function(input, output, session) {
   
+  ### Interactive plotly plots incompatibility check
+  observe({
+    ggplot2_version <- utils::packageVersion("ggplot2")
+    plotly_version  <- utils::packageVersion("plotly")
+    
+    if (ggplot2_version >= "4.0.0" && plotly_version <= "4.11.0") {
+      
+      plotly_incompatible_inputs <- c(
+        "do_data_plotly",
+        "do_data_ind_plotly", 
+        "do_sim_plotly",
+        "do_psa_plotly_model_1",
+        "do_psa_plotly_model_2",
+        "do_tor_plotly_model_1",
+        "do_tor_plotly_model_2",
+        "do_iiv_plotly",
+        "do_exp_plotly"
+      )
+      
+      for (id in plotly_incompatible_inputs) {
+        shinyjs::disable(id)
+        updateCheckboxInput(session, id, value = FALSE)
+      }
+      
+      shiny::showNotification(
+        paste0("WARNING: ggplot2 ", ggplot2_version, " is incompatible with plotly ", 
+               plotly_version, ". Interactive plots have been disabled. ",
+               "Please update plotly to >=4.11.0 to re-enable."),
+        type     = "warning",
+        duration = NULL  # stays until dismissed
+      )
+    }
+  })
+  
   # Handling save / load session states
   
   output$btn_save_session <- downloadHandler(

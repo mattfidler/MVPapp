@@ -3086,68 +3086,6 @@ update_model_object <- function(input_model_object, input_new_df, convert_colnam
 #' @export
 #-------------------------------------------------------------------------------
 
-# convert_to_plotly_watermark <- function(ggplot_object,
-#                                         opacity     = 0.05,
-#                                         font_name   = "Arial",
-#                                         format      = "png",
-#                                         filename    = "newplot",
-#                                         width       = NULL,
-#                                         height      = NULL,
-#                                         debug       = FALSE,
-#                                         try_tooltip = FALSE,
-#                                         plotly_watermark = TRUE) {
-# 
-#   if (debug) message("Converting ggplot object to plotly")
-# 
-#   # Flow directly into pipe — avoids intermediate assignment
-#   tmp <- plotly::ggplotly(
-#     ggplot_object,
-#     tooltip = if (try_tooltip) "text" else FALSE
-#   )
-#   
-#   # Only add annotation layer when watermark is actually required
-#   if (plotly_watermark) {
-#     tmp <- plotly::add_annotations(
-#       tmp,
-#       text      = "For Internal Use Only",
-#       xref      = "paper",
-#       yref      = "paper",
-#       x         = 0.5,
-#       y         = 0.5,
-#       showarrow = FALSE,
-#       font      = list(
-#         family = font_name,
-#         size   = 58,
-#         color  = paste0("rgba(0, 0, 0, ", opacity, ")")
-#       )
-#     )
-#   }
-#   
-#   tmp <- plotly::config(
-#     tmp,
-#     toImageButtonOptions = list(
-#       format   = format,
-#       filename = filename,
-#       height   = height,
-#       width    = width,
-#       scale    = 1
-#     ),
-#     modeBarButtonsToAdd = c(
-#       "drawopenpath",
-#       "drawline",
-#       "drawcircle",
-#       "drawrect",
-#       "eraseshape"
-#     ),
-#     displayModeBar = TRUE,
-#     displaylogo    = FALSE
-#   )
-#   
-#   if (debug) message("Converting ggplot object to plotly successful.")
-#   
-#   tmp
-# }
-
 convert_to_plotly_watermark <- function(ggplot_object,
                                         # logx        = FALSE,
                                         # logy        = FALSE,
