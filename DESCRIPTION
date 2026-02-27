@@ -53,7 +53,7 @@ Suggests: ellmer (>= 0.4.0),
           readr,
           rmarkdown,
           shinyalert
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.1)
 LazyData: true
 Collate: "utils-pipe.R"
          "utils.R"
