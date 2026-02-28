@@ -6008,12 +6008,15 @@ translate_model_code <- function(ready_path,
     }
     
     list_of_output <- list(
-      answer          = clean_llm_response(result$answer),
+      answer          = result$answer,
       conversation_id = result$conversation_id,
       chat_obj        = result$chat_obj
     )
     
     if(debug) llm_result <<- list_of_output
+    
+    list_of_output$answer <- clean_llm_response(list_of_output$answer)
+    
     return(list_of_output)
     
   } else {
@@ -6242,15 +6245,19 @@ refine_model_code <- function(model_code,
         duration = 25
       )
     }
-    
-    # Only assign globally during development
-    if(debug) llm_refine <<- result
-    
-    return(list(
-      answer          = clean_llm_response(result$answer),
+  
+    list_of_output <- list(
+      answer          = result$answer,
       conversation_id = result$conversation_id,
       chat_obj        = result$chat_obj
-    ))
+    )
+    
+    # Only assign globally during development
+    if(debug) llm_refine <<- list_of_output
+    
+    list_of_output$answer <- clean_llm_response(list_of_output$answer)
+
+    return(list_of_output)
     
   } else {
     return(NULL)
