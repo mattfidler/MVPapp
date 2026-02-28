@@ -24,10 +24,10 @@ run_mvp(
   model_openrouter = "arcee-ai/trinity-large-preview:free",
   model_openai_compatible = "gpt-5.2",
   model_deepseek = "deepseek-reasoner",
-  model_apollo = "gpt-5.2",
+  model_apollo = "claude_4_6_sonnet",
   model_azure = "gpt-5.2",
   model_aws = "anthropic.claude-sonnet-4-6",
-  temperature = 0.1,
+  temperature = 0,
   llm_seed = 42,
   model_lang = "mrgsolve",
   prompts_path = system.file("shiny/prompts.R", package = "MVPapp"),
@@ -54,9 +54,9 @@ run_mvp(
 
 \item{api_chat}{Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers}
 
-\item{user_id}{Character. Default mrgsolve_translator. User ID for LLMs.}
+\item{user_id}{Character. Default mrgsolve_translator. User ID for LLMs (BI-only).}
 
-\item{user_id_retry}{Character. Default mrgsolve_translator. User ID for submitting retries to LLMs.}
+\item{user_id_retry}{Character. Default mrgsolve_translator. User ID for submitting retries to LLMs (BI-only).}
 
 \item{reuse_context}{Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.}
 
@@ -78,7 +78,7 @@ run_mvp(
 
 \item{model_aws}{Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.}
 
-\item{temperature}{Numeric. Default 0.1. Between 0 (more deterministic) to 1 (more creative) (not all models support this).}
+\item{temperature}{Numeric. Default 0, between 0 (more deterministic) to 1 (more creative) (not all models support this).}
 
 \item{llm_seed}{Numeric. Default 42. Seed number for LLMs (not all models support this).}
 

@@ -50,15 +50,16 @@ if(standalone_mode) {
   llm_choices             = c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Azure OpenAI", "AWS Bedrock")
   api_upload              = NA_character_  
   api_chat                = NA_character_ 
-  user_id                 = "mrgsolve_translator"
-  user_id_retry           = "mrgsolve_translator" # Must use same user ID to carry same conversation
+  user_id                 = "mrgsolve_translator" # For BI-only
+  user_id_retry           = "mrgsolve_translator" # For BI-only, must use same user ID to carry same conversation
   reuse_context           = FALSE # Re-use same conversation to keep original context for better re-iteration answers
   model_gemini            = "gemini-3-flash-preview"
-  model_openai            = "gpt-5.2" # "gpt-5-mini" "gpt-5.2"
+  model_openai            = "gpt-5.2" # "gpt-5-mini"
   model_anthropic         = "claude-sonnet-4-6" # "claude-haiku-4-5-20251001" 
   model_openrouter        = "arcee-ai/trinity-large-preview:free"  # "openrouter/free"
   model_openai_compatible = "gpt-5-mini"
   model_deepseek          = "deepseek-reasoner"
+  model_apollo            = "claude_4_6_sonnet" # For BI-only
   model_azure             = "gpt-5.2"
   model_aws               = "anthropic.claude-sonnet-4-6"
   temperature             = 0.1
@@ -88,6 +89,8 @@ if(!exists("model_openai"))            {model_openai             <- "gpt-5-mini"
 if(!exists("model_anthropic"))         {model_anthropic          <- "claude-sonnet-4-6"}
 if(!exists("model_openrouter"))        {model_openrouter         <- "openrouter/free"}
 if(!exists("model_openai_compatible")) {model_openai_compatible  <- "gpt-5-mini"}
+if(!exists("model_deepseek"))          {model_deepseek           <- "deepseek-reasoner"}
+if(!exists("model_apollo"))            {model_apollo             <- "claude_4_6_sonnet"}
 if(!exists("model_azure"))             {model_azure              <- "gpt-5.2"}
 if(!exists("model_aws"))               {model_aws                <- "anthropic.claude-sonnet-4-6"}
 if(!exists("temperature"))             {temperature              <- 0.1}
@@ -3967,6 +3970,11 @@ server <- function(input, output, session) {
     }
     shiny::req(input$pdffile_model_1, api_key)
     
+    if(llm_service == "OpenAI-Compatible" && is.na(api_chat)) {
+      showNotification("ERROR: Please specify 'api_chat' URL as an argument when using OpenAI-Compatible.", type = "error", duration = 10)
+      return(NULL)
+    }
+    
     ## Validating and combining single or multiple files
     ready_path <- prepare_uploaded_files(
       files             = input$pdffile_model_1,
@@ -4038,7 +4046,12 @@ server <- function(input, output, session) {
     
     base_progress   <- 0.4  # Assume translation ended at 40%, have to align with translate_model_code function
     remaining_space <- 1 - base_progress
-    max_retries     <- as.numeric(input$max_retries_model_1 %||% 0)
+    if(model_lang != "mrgsolve") {
+      max_retries     <- 0
+      shiny::showNotification(paste0("No Retries when translating to ", model_lang, "."), type = "message", duration = 10)
+    } else {
+      max_retries     <- as.numeric(input$max_retries_model_1 %||% 0)      
+    }
     
     # Always show the initial translation in the editor
     update_editor(current_code$answer)
@@ -4205,6 +4218,11 @@ server <- function(input, output, session) {
     }
     shiny::req(input$pdffile_model_2, api_key)
     
+    if(llm_service == "OpenAI-Compatible" && is.na(api_chat)) {
+      showNotification("ERROR: Please specify 'api_chat' URL as an argument when using OpenAI-Compatible.", type = "error", duration = 10)
+      return(NULL)
+    }
+    
     ## Validating and combining single or multiple files
     ready_path <- prepare_uploaded_files(
       files             = input$pdffile_model_2,
@@ -4274,7 +4292,12 @@ server <- function(input, output, session) {
     
     base_progress   <- 0.4  # Assume translation ended at 40%, have to align with translate_model_code function
     remaining_space <- 1 - base_progress
-    max_retries     <- as.numeric(input$max_retries_model_2 %||% 0)
+    if(model_lang != "mrgsolve") {
+      max_retries     <- 0
+      shiny::showNotification(paste0("No Retries when translating to ", model_lang, "."), type = "message", duration = 10)
+    } else {
+      max_retries     <- as.numeric(input$max_retries_model_2 %||% 0)      
+    }
     
     # Always show the initial translation in the editor
     update_editor(current_code$answer)

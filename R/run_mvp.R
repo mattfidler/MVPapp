@@ -20,8 +20,8 @@
 #' @param llm_choices Character. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "Deepseek", "Azure OpenAI", "AWS Bedrock"
 #' @param api_upload Character. Default NA_character_. API upload URL when using Dify-based workflows
 #' @param api_chat Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers
-#' @param user_id Character. Default mrgsolve_translator. User ID for LLMs.
-#' @param user_id_retry Character. Default mrgsolve_translator. User ID for submitting retries to LLMs.
+#' @param user_id Character. Default mrgsolve_translator. User ID for LLMs (BI-only).
+#' @param user_id_retry Character. Default mrgsolve_translator. User ID for submitting retries to LLMs (BI-only).
 #' @param reuse_context Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.
 #' @param model_gemini Character. Default gemini-3-flash-preview. Model for Gemini.
 #' @param model_openai Character. Default gpt-5.2. Model for OpenAI / ChatGPT.
@@ -32,7 +32,7 @@
 #' @param model_apollo Character. Default gpt-5.2 (BI-only)
 #' @param model_azure Character. Default gpt-5.2. Model for Azure OpenAI.
 #' @param model_aws Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.
-#' @param temperature Numeric. Default 0.1. Between 0 (more deterministic) to 1 (more creative) (not all models support this).
+#' @param temperature Numeric. Default 0, between 0 (more deterministic) to 1 (more creative) (not all models support this).
 #' @param llm_seed Numeric. Default 42. Seed number for LLMs (not all models support this).
 #' @param model_lang Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)
 #' @param prompts_path Prompts file. See vignette ("automatic-translation") for more information.
@@ -81,10 +81,10 @@ run_mvp <- function(appDir                  = system.file("shiny", package = "MV
                     model_openrouter        = "arcee-ai/trinity-large-preview:free",  # "openrouter/free"
                     model_openai_compatible = "gpt-5.2",
                     model_deepseek          = "deepseek-reasoner",
-                    model_apollo            = "gpt-5.2",
+                    model_apollo            = "claude_4_6_sonnet", # For BI-only
                     model_azure             = "gpt-5.2",
                     model_aws               = "anthropic.claude-sonnet-4-6",
-                    temperature             = 0.1,
+                    temperature             = 0,
                     llm_seed                = 42,
                     model_lang              = "mrgsolve",
                     prompts_path            = system.file("shiny/prompts.R", package = "MVPapp"),

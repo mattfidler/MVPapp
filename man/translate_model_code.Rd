@@ -52,7 +52,7 @@ for MIME type detection). If \code{NULL}, derived from \code{ready_path}.}
 
 \item{api_chat}{API URL for chat messages, required when using OpenAI-compatible API}
 
-\item{user_id}{user id for the request}
+\item{user_id}{user id for the request (BI-only)}
 
 \item{model_gemini}{Model to be used when calling Gemini API}
 

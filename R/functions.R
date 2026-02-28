@@ -5734,7 +5734,7 @@ safely_incProgress <- function(amount, detail = NULL) {
 #' @param api_key API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc
 #' @param api_upload API URL for uploading of files (Dify requires a 2-step process)
 #' @param api_chat API URL for chat messages, required when using OpenAI-compatible API
-#' @param user_id user id for the request
+#' @param user_id user id for the request (BI-only)
 #' @param model_gemini Model to be used when calling Gemini API
 #' @param model_openai Model to be used when calling OpenAI API
 #' @param model_anthropic Model to be used when calling Anthropic API
