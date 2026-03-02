@@ -34,7 +34,7 @@
 #' @param model_aws Character. Default anthropic.claude-sonnet-4-6. Model for AWS Bedrock.
 #' @param temperature Numeric. Default 0, between 0 (more deterministic) to 1 (more creative) (not all models support this).
 #' @param llm_seed Numeric. Default 42. Seed number for LLMs (not all models support this).
-#' @param model_lang Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)
+#' @param model_lang Character. Default mrgsolve. Changes model translation language to "mrgsolve", "nonmem" (for testing only), "rxode2" (for testing only)
 #' @param prompts_path Prompts file. See vignette ("automatic-translation") for more information.
 #' @param show_debugging_msg Logical. Default FALSE. Set to TRUE to output verbose working messages in the console, useful for debugging.
 #' @param ... [shiny::runApp()] parameters, [shiny::shinyApp()] parameters,

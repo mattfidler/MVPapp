@@ -5755,6 +5755,9 @@ safely_incProgress <- function(amount, detail = NULL) {
 #' @param nonmem_system_prompt String for nonmem system prompt
 #' @param nonmem_long_user_prompt String for nonmem long user prompt
 #' @param nonmem_short_user_prompt String for nonmem short user prompt
+#' @param rxode2_system_prompt String for rxode2 system prompt
+#' @param rxode2_long_user_prompt String for rxode2 long user prompt
+#' @param rxode2_short_user_prompt String for rxode2 short user prompt
 #' @param internal_version Logical. Only relevant for BI
 #' @param debug Displays debug messages
 #'
@@ -5798,6 +5801,9 @@ translate_model_code <- function(ready_path,
                                  nonmem_system_prompt,
                                  nonmem_long_user_prompt,
                                  nonmem_short_user_prompt,
+                                 rxode2_system_prompt,
+                                 rxode2_long_user_prompt,
+                                 rxode2_short_user_prompt,                                 
                                  internal_version = TRUE,
                                  debug = TRUE
 ) {
@@ -5820,7 +5826,9 @@ translate_model_code <- function(ready_path,
 
   model_name <- switch(service,
                        "PROD"              = "[PROD model]",
+                       "PMx Co-Modeler"          = "[Apollo model]",
                        "EXP"               = "[EXP model]",
+                       "Fast"              = "[Apollo model]",
                        "Gemini"            = model_gemini,
                        "OpenAI"            = model_openai,
                        "Claude"            = model_anthropic,
@@ -5857,7 +5865,13 @@ translate_model_code <- function(ready_path,
     short_user_prompt <- nonmem_short_user_prompt
   }
   
-  if(service == "dify") {
+  if(model_lang == "rxode2") {
+    system_prompt     <- rxode2_system_prompt
+    long_user_prompt  <- rxode2_long_user_prompt
+    short_user_prompt <- rxode2_short_user_prompt    
+  }
+  
+  if(service == "PROD" | service == "EXP" | service == "PMx Co-Modeler" | service == "Fast") {
     instruction_prompt <- short_user_prompt
   } else {
     instruction_prompt <- long_user_prompt
@@ -5915,7 +5929,7 @@ translate_model_code <- function(ready_path,
       start_time <- Sys.time()
       safely_incProgress(0.3, detail = paste0("Generating ", model_lang, " code using ", model_name, " (please be patient, takes ~1 min)..."))
 
-      branch_result <- if (service == "PROD" | service == "EXP") {
+      branch_result <- if (service == "PROD" | service == "EXP" | service == "PMx Co-Modeler" | service == "Fast") {
         
         if(debug) print("translate_model_code: 3) Dify branch")
         run_dify_chat(
@@ -6086,7 +6100,7 @@ refine_model_code <- function(model_code,
                               progress_bar = 0.4,
                               max_retries = 2,
                               display_info = TRUE,
-                              temperature = 0.1,
+                              temperature = 0,
                               seed = 42,
                               attempt = 1,
                               system_prompt,
@@ -6098,7 +6112,9 @@ refine_model_code <- function(model_code,
   
   model_name <- switch(service,
                        "PROD"              = "[PROD model]",
+                       "PMx Co-Modeler"          = "[Apollo model]",
                        "EXP"               = "[EXP model]",
+                       "Fast"              = "[Apollo model]",
                        "Gemini"            = model_gemini,
                        "OpenAI"            = model_openai,
                        "Claude"            = model_anthropic,
@@ -6122,7 +6138,7 @@ refine_model_code <- function(model_code,
   # Calculate the width of one retry segment (e.g., 0.2 if max_retries is 3)
   segment_width <- (1 - 0.4) / max_retries
 
-  if(service == "PROD" | service == "EXP") {
+  if(service == "PROD" | service == "EXP" | service == "Fast" | service == "PMx Co-Modeler") {
     instruction_prompt <- short_user_prompt
   } else {
     instruction_prompt <- long_user_prompt
@@ -6158,7 +6174,7 @@ refine_model_code <- function(model_code,
       start_time <- Sys.time()
       
       # --- BRANCH A: DIFY (Manual httr2 Logic) ---
-      branch_result <- if(service == "PROD" | service == "EXP") {
+      branch_result <- if(service == "PROD" | service == "EXP" | service == "Fast" | service == "PMx Co-Modeler") {
         run_dify_chat(
           conversation_id    = if(reuse_context) context$conversation_id else NULL,
           instruction_prompt = retry_prompt,
@@ -6921,7 +6937,9 @@ combine_uploaded_files <- function(file_paths, file_names) {
 get_api_key <- function(llm_service) {
   switch(llm_service, # edit with usethis::edit_r_environ()
          "PROD"              = Sys.getenv("DIFY_API_KEY"),
+         "PMx Co-Modeler"          = Sys.getenv("DIFY_API_KEY"),
          "EXP"               = Sys.getenv("DIFY_API_KEY_2"),
+         "Fast"              = Sys.getenv("DIFY_API_KEY_2"),
          "Claude"            = Sys.getenv("ANTHROPIC_API_KEY"),
          "Gemini"            = Sys.getenv("GEMINI_API_KEY"),
          "OpenAI"            = Sys.getenv("OPENAI_API_KEY"),
@@ -6951,7 +6969,9 @@ get_api_key <- function(llm_service) {
 get_api_key_name <- function(llm_service) {
   switch(llm_service,
          "PROD"              = "DIFY_API_KEY",
+         "PMx Co-Modeler"          = "DIFY_API_KEY",
          "EXP"               = "DIFY_API_KEY_2",
+         "Fast"              = "DIFY_API_KEY_2",
          "Claude"            = "ANTHROPIC_API_KEY",
          "Gemini"            = "GEMINI_API_KEY",
          "OpenAI"            = "OPENAI_API_KEY",

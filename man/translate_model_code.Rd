@@ -32,6 +32,9 @@ translate_model_code(
   nonmem_system_prompt,
   nonmem_long_user_prompt,
   nonmem_short_user_prompt,
+  rxode2_system_prompt,
+  rxode2_long_user_prompt,
+  rxode2_short_user_prompt,
   internal_version = TRUE,
   debug = TRUE
 )
@@ -93,6 +96,12 @@ for MIME type detection). If \code{NULL}, derived from \code{ready_path}.}
 \item{nonmem_long_user_prompt}{String for nonmem long user prompt}
 
 \item{nonmem_short_user_prompt}{String for nonmem short user prompt}
+
+\item{rxode2_system_prompt}{String for rxode2 system prompt}
+
+\item{rxode2_long_user_prompt}{String for rxode2 long user prompt}
+
+\item{rxode2_short_user_prompt}{String for rxode2 short user prompt}
 
 \item{internal_version}{Logical. Only relevant for BI}
 

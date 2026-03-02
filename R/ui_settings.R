@@ -210,7 +210,7 @@ llm_accept_single_types <- c(".pdf", ".txt", ".docx", ".html", ".md", ".markdown
 llm_accept_multi_types  <- c(".pdf", ".txt", ".mod", ".ctl")
 #' @export
 llm_choices_label     <- shiny::HTML(paste0("Select LLM",
-                                            "<i class='fa fa-question-circle' title='MVP supports several main LLM providers (requires separate API keys). This requires the .Renviron file be configured correctly (note: the api_chat URL argument must also be provided if using a OpenAI-compatible API).' style='margin-left: 3px;'></i>"))
+                                            "<i class='fa fa-question-circle' title='MVP supports several main LLM providers. This requires the .Renviron file be configured correctly (note: the api_chat URL argument must also be provided if using a OpenAI-compatible API).' style='margin-left: 3px;'></i>"))
 #' @export
 llm_max_retries_label <- shiny::HTML(paste0("Retries ",
                                             "<i class='fa fa-question-circle' title='Number of automatic fix attempts if model compilation fails.' style='margin-left: 3px;'></i>"))

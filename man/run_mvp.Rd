@@ -82,7 +82,7 @@ run_mvp(
 
 \item{llm_seed}{Numeric. Default 42. Seed number for LLMs (not all models support this).}
 
-\item{model_lang}{Character. Default mrgsolve. Changes model translation language to "mrgsolve" or "nonmem" (unsupported)}
+\item{model_lang}{Character. Default mrgsolve. Changes model translation language to "mrgsolve", "nonmem" (for testing only), "rxode2" (for testing only)}
 
 \item{prompts_path}{Prompts file. See vignette ("automatic-translation") for more information.}
 

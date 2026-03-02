@@ -71,9 +71,13 @@ When you launch MVP (`run_mvp()`), you may specify more options associated with 
   - `model_lang`: Output `mrgsolve` or `nonmem` code in the response (see below).
   - `prompts_path`: Path of the [prompts file](https://github.com/stevechoy/MVPapp/blob/master/inst/shiny/prompts.R){target="_blank"}, by default it is in the installed package directory of `MVPapp` (see below).  
 
-For example, if I am a Claude user and I want the results to be reproducible, I would launch MVP as follows:  
+For example, if you want to use Moonshot AI's Kimi K2.5 model (i.e. a OpenAI-Compatible provider), one would launch MVP as follows (after configuring the corresponding `OPENAI_COMPATIBLE_API_KEY` field in .Renviron):  
 
-`run_mvp(model_anthropic = "claude-sonnet-4-6", temperature = 0, llm_seed = 42)`  
+`run_mvp(model_openai_compatible = "kimi-k2.5", api_chat = "https://api.moonshot.ai/v1/chat/completions")`  
+
+In another second example, if you already have Claude API access, and just want to change the model, you could try something like:  
+
+`run_mvp(model_anthropic = "claude-haiku-4-5-20251001")`  
 
 
 As the advancement of models happens frequently (on a time scale of months), it is recommended that the user pays particular attention and __specify a preferred model name__ as appropriate, as the default options may become outdated and deprecated.  
@@ -111,7 +115,7 @@ After each LLM response has been received, a notification will be displayed on t
 
 + The `prompts_path` argument when launching `run_mvp()` allows the user to provide their own prompts. By default, the included `prompts.R` file is used (located in the `/shiny` subfolder of `MVPapp`, whereby the path can be located by `find.package("MVPapp")`). The prompts are fine-tuned based on trial-and-error, and may change in newer versions to improve first-try success rates based on user feedback.  It is recommended that users make a copy of the file before making adjustments.  
 + A seed of `42` and a temperature setting of `0` is used by default. Please note that the use of a seed or setting a temperature to 0 may not necessarily guarantee reproducibility (depending on the provider).  
-+ While the feature is currently limited to translating and compiling into mrgsolve, in principle it can be quite easily adapted to any other language. The `model_lang` argument controls the output language, which is set to `mrgsolve` by default. For testing purposes, `nonmem` is also available (MVP app does not support executing NONMEM, so retries will be automatically set to 0).     
++ While the feature is currently limited to translating and compiling into mrgsolve, in principle it can be quite easily adapted to any other language. The `model_lang` argument controls the output language, which is set to `mrgsolve` by default. For testing purposes, `nonmem` and `rxode2` is also available (MVP app does not support executing NONMEM or RxODE2, so retries will be automatically set to 0).     
 + If the launch argument `show_debugging_msg = TRUE`, the responses will be saved as the R objects `llm_result` (for initial translation)  and `llm_refine` (for retries) in the global environment for review.    
 
 ## Performance Evaluation  
