@@ -85,7 +85,7 @@ if(!exists("user_id"))                 {user_id                  <- "mrgsolve_tr
 if(!exists("user_id_retry"))           {user_id_retry            <- "mrgsolve_translator"}
 if(!exists("reuse_context"))           {reuse_context            <- FALSE}
 if(!exists("model_gemini"))            {model_gemini             <- "gemini-3-flash-preview"}
-if(!exists("model_openai"))            {model_openai             <- "gpt-5-mini"}
+if(!exists("model_openai"))            {model_openai             <- "gpt-5.2"}
 if(!exists("model_anthropic"))         {model_anthropic          <- "claude-sonnet-4-6"}
 if(!exists("model_openrouter"))        {model_openrouter         <- "openrouter/free"}
 if(!exists("model_openai_compatible")) {model_openai_compatible  <- "gpt-5-mini"}
@@ -4031,13 +4031,16 @@ server <- function(input, output, session) {
       temperature                = temperature,
       seed                       = llm_seed,
       locally_parse_file         = input$locally_parse_model_1,
-      model_lang                 = "mrgsolve",
+      model_lang                 = model_lang,
       mrgsolve_system_prompt     = mrgsolve_translation_system_prompt,
       mrgsolve_long_user_prompt  = mrgsolve_translation_long_user_prompt,
       mrgsolve_short_user_prompt = mrgsolve_translation_short_user_prompt,
       nonmem_system_prompt       = nonmem_translation_system_prompt,
       nonmem_long_user_prompt    = nonmem_translation_long_user_prompt,
       nonmem_short_user_prompt   = nonmem_translation_short_user_prompt,
+      rxode2_system_prompt       = rxode2_translation_system_prompt,
+      rxode2_long_user_prompt    = rxode2_translation_long_user_prompt,
+      rxode2_short_user_prompt   = rxode2_translation_short_user_prompt,
       internal_version           = internal_version,
       debug                      = show_debugging_msg
     )
@@ -4277,13 +4280,16 @@ server <- function(input, output, session) {
       temperature                = temperature,
       seed                       = llm_seed,
       locally_parse_file         = input$locally_parse_model_2,
-      model_lang                 = "mrgsolve",
+      model_lang                 = model_lang,
       mrgsolve_system_prompt     = mrgsolve_translation_system_prompt,
       mrgsolve_long_user_prompt  = mrgsolve_translation_long_user_prompt,
       mrgsolve_short_user_prompt = mrgsolve_translation_short_user_prompt,
       nonmem_system_prompt       = nonmem_translation_system_prompt,
       nonmem_long_user_prompt    = nonmem_translation_long_user_prompt,
       nonmem_short_user_prompt   = nonmem_translation_short_user_prompt,
+      rxode2_system_prompt       = rxode2_translation_system_prompt,
+      rxode2_long_user_prompt    = rxode2_translation_long_user_prompt,
+      rxode2_short_user_prompt   = rxode2_translation_short_user_prompt,
       internal_version           = internal_version,
       debug                      = show_debugging_msg
     )
