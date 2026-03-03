@@ -6314,8 +6314,8 @@ clean_llm_response <- function(final_answer) {
   # 2. Perform all escapes in one pass using a named vector
   # Uses fixed() for maximum performance on large strings
   replaces <- c("\\\\" = "\\\\",  
-                "\"" = "\\\\\"", 
-                "'" = "\\\\'")
+                "\"" = "\\\"", 
+                "'" = "\\'")
   
   final_answer <- stringr::str_replace_all(final_answer, stringr::fixed(replaces))
   
