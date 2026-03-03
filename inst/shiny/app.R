@@ -96,7 +96,7 @@ if(!exists("model_aws"))               {model_aws                <- "anthropic.c
 if(!exists("temperature"))             {temperature              <- 0}
 if(!exists("llm_seed"))                {llm_seed                 <- 42}
 if(!exists("model_lang"))              {model_lang               <- "mrgsolve"}
-if(!exists("prompts_path"))            {prompts_path             <- NA_character_} 
+if(!exists("prompts_path"))            {prompts_path             <- "https://github.com/stevechoy/MVPapp/raw/refs/heads/master/inst/shiny/prompts.R"} 
 if(!exists("show_debugging_msg"))      {show_debugging_msg       <- TRUE}
 
 if(!exists("bi_logo")) { # Check whether one of the objects in the app exists
@@ -2417,9 +2417,7 @@ ui <- shiny::navbarPage(
                                    tags$li("Subplots for Individual Plots may become unevenly sized for interactive plots."),
                                    tags$li("Using 'outvars' would sometimes fail to display the plot. A current workaround is to re-define the outvars to a compartment name and then switching back."),
                                    tags$li("Model will crash if model code contains 'R_' pattern which does not refer to modelling rate."),
-                                   #tags$li("Weight-based dosing is not propagated in IIV models."),
                                    tags$li("When 'Model Duration' is checked and then a dose is inserted into a compartment where the appropriate syntax (e.g. 'D_[CMT]') is not present, the app will crash. Workaround with providing a miniscule amount to D_[CMT] (e.g. D_GUT = 0.0001)"),
-                                   #tags$li("Bad inputs to parameter values (e.g. negative values when there isn't supposed to be one) may crash the app."),
                                    tags$li("Graphical issues when using the Show AUC option with the Log Y axis option."),
                                    tags$li("Maximum upload dataset size is currently limited to 100 MB."),
                                    tags$li("Recommended minimum resolution is 1920 * 1080 pixels in full screen mode at 100% size.")
