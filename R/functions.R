@@ -5826,7 +5826,7 @@ translate_model_code <- function(ready_path,
 
   model_name <- switch(service,
                        "PROD"              = "[PROD model]",
-                       "PMx Co-Modeler"          = "[Apollo model]",
+                       "PMx Co-Modeler"    = "[Apollo model]",
                        "EXP"               = "[EXP model]",
                        "Fast"              = "[Apollo model]",
                        "Gemini"            = model_gemini,
@@ -6072,6 +6072,11 @@ translate_model_code <- function(ready_path,
 #' @param temperature Goes from 0 to 1, where 0 is deterministic, if not reusing context
 #' @param seed seed number for LLMs, if not reusing context
 #' @param attempt current attempt number
+#' @param system_prompt Character. System prompt
+#' @param long_user_prompt Character. Long user prompt
+#' @param short_user_prompt Character. Short user prompt
+#' @param internal_version Logical. Only relevant for BI
+#' @param feedback_success Logical. Only relevant for BI, and if reuse_context = TRUE
 #' @param debug Displays debug messages
 #'
 #' @returns a named list of "answer", "conversation_id", "chat_obj"
@@ -6107,12 +6112,13 @@ refine_model_code <- function(model_code,
                               long_user_prompt,
                               short_user_prompt,
                               internal_version,
+                              feedback_success = FALSE,
                               debug = TRUE
 ) {
   
   model_name <- switch(service,
                        "PROD"              = "[PROD model]",
-                       "PMx Co-Modeler"          = "[Apollo model]",
+                       "PMx Co-Modeler"    = "[Apollo model]",
                        "EXP"               = "[EXP model]",
                        "Fast"              = "[Apollo model]",
                        "Gemini"            = model_gemini,
@@ -6136,7 +6142,11 @@ refine_model_code <- function(model_code,
   }
   
   # Calculate the width of one retry segment (e.g., 0.2 if max_retries is 3)
-  segment_width <- (1 - 0.4) / max_retries
+  if(!feedback_success) {
+    segment_width <- (1 - 0.4) / max_retries 
+  } else {
+    segment_width <- 0 # Setting progress bar to 0 when relaying success messages
+  }
 
   if(service == "PROD" | service == "EXP" | service == "Fast" | service == "PMx Co-Modeler") {
     instruction_prompt <- short_user_prompt
@@ -6162,14 +6172,29 @@ refine_model_code <- function(model_code,
   
   if(reuse_context) {
     safely_showNotification("Keeping same conversation to improve results...")
+    if(feedback_success) {
+      retry_prompt <- paste0(
+        "Model compiled successfully!"
+      )
+      safely_showNotification(paste0(retry_prompt, " Feeding back to ", service, "."))
+    }
   }
   
   if(debug) {print(paste0("refine_model_code: 1) ", retry_prompt))}
   
   result <- tryCatch({
     
-    safely_withProgress(message = 'Processing...', value = progress_bar, {
-      safely_incProgress(segment_width * 0.33, detail = paste("Re-iterating after failed compilation..."))
+    if(feedback_success) {
+      process_msg <- "Relaying success..."
+    } else {
+      process_msg <- "Processing..."
+    }
+    
+    safely_withProgress(message = process_msg, value = progress_bar, {
+      
+      if(!feedback_success) {
+        safely_incProgress(segment_width * 0.33, detail = paste("Re-iterating after failed compilation..."))
+      }
       
       start_time <- Sys.time()
       
@@ -6202,7 +6227,9 @@ refine_model_code <- function(model_code,
       
       if(debug) {branch_refine <<- branch_result}
       
-      safely_incProgress(segment_width * 0.33, detail = paste("Cleaning response..."))
+      if(!feedback_success) {
+        safely_incProgress(segment_width * 0.33, detail = paste("Cleaning response..."))
+      }
       
       # Return everything needed after tryCatch as a named list
       list(
@@ -6269,11 +6296,16 @@ refine_model_code <- function(model_code,
     )
     
     # Only assign globally during development
-    if(debug) llm_refine <<- list_of_output
+    if(debug && !feedback_success) llm_refine <<- list_of_output
+    if(debug && feedback_success) llm_success <<- list_of_output
     
     list_of_output$answer <- clean_llm_response(list_of_output$answer)
-
-    return(list_of_output)
+    
+    if(feedback_success) {
+      return(model_code) ## Not that it matters, since we're calling this function for its side effect when relaying success
+    } else {
+      return(list_of_output)      
+    }
     
   } else {
     return(NULL)
@@ -6937,7 +6969,7 @@ combine_uploaded_files <- function(file_paths, file_names) {
 get_api_key <- function(llm_service) {
   switch(llm_service, # edit with usethis::edit_r_environ()
          "PROD"              = Sys.getenv("DIFY_API_KEY"),
-         "PMx Co-Modeler"          = Sys.getenv("DIFY_API_KEY"),
+         "PMx Co-Modeler"    = Sys.getenv("DIFY_API_KEY"),
          "EXP"               = Sys.getenv("DIFY_API_KEY_2"),
          "Fast"              = Sys.getenv("DIFY_API_KEY_2"),
          "Claude"            = Sys.getenv("ANTHROPIC_API_KEY"),
@@ -6969,7 +7001,7 @@ get_api_key <- function(llm_service) {
 get_api_key_name <- function(llm_service) {
   switch(llm_service,
          "PROD"              = "DIFY_API_KEY",
-         "PMx Co-Modeler"          = "DIFY_API_KEY",
+         "PMx Co-Modeler"    = "DIFY_API_KEY",
          "EXP"               = "DIFY_API_KEY_2",
          "Fast"              = "DIFY_API_KEY_2",
          "Claude"            = "ANTHROPIC_API_KEY",

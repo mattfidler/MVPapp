@@ -3986,8 +3986,6 @@ server <- function(input, output, session) {
     print(paste0("api_key_model_1: ", api_key))
     print(paste0("llm_service_model_1: ", llm_service))
     
-    
-    
     # ── Helper: update the ACE editor ─────────────────────────────────────────
     update_editor <- function(code) {
       shinyAce::updateAceEditor(
@@ -4063,6 +4061,43 @@ server <- function(input, output, session) {
     if (mrgsolve::is.mrgmod(compilation$result)) {
       # Success on first pass — notify, update editor, and stop
       shiny::showNotification(llm_compile_success, type = "message", duration = 10)
+      
+      if(reuse_context && llm_service == "PMx Co-Modeler") {
+        # Relay success to PMx Co-Modeler
+        if(show_debugging_msg) message("Relaying success")
+        relay_success <- refine_model_code(
+          model_code                 = current_code$answer,
+          error_message              = "N/A",
+          context                    = current_code,
+          reuse_context              = reuse_context,
+          service                    = llm_service,
+          api_key                    = api_key,
+          api_chat                   = api_chat,
+          user_id                    = user_id_retry,
+          model_gemini               = model_gemini,
+          model_openai               = model_openai,
+          model_anthropic            = model_anthropic,
+          model_openrouter           = model_openrouter,
+          model_openai_compatible    = model_openai_compatible,
+          model_deepseek             = model_deepseek,
+          model_apollo               = model_apollo,
+          model_azure                = model_azure,
+          model_aws                  = model_aws,
+          progress_bar               = 0,
+          max_retries                = max_retries,
+          display_info               = FALSE,
+          temperature                = temperature,
+          seed                       = llm_seed,
+          attempt                    = attempt,
+          system_prompt              = mrgsolve_refine_system_prompt,
+          long_user_prompt           = mrgsolve_refine_long_user_prompt,
+          short_user_prompt          = mrgsolve_refine_short_user_prompt,
+          internal_version           = internal_version,
+          feedback_success           = TRUE,
+          debug                      = show_debugging_msg
+        )
+      }
+      
       update_editor(current_code$answer)
       return()
     }
@@ -4119,6 +4154,7 @@ server <- function(input, output, session) {
         long_user_prompt           = mrgsolve_refine_long_user_prompt,
         short_user_prompt          = mrgsolve_refine_short_user_prompt,
         internal_version           = internal_version,
+        feedback_success           = FALSE,
         debug                      = show_debugging_msg
       )
       
@@ -4133,6 +4169,43 @@ server <- function(input, output, session) {
       if (mrgsolve::is.mrgmod(compilation$result)) {
         # Success — notify, update editor, and stop
         shiny::showNotification(llm_compile_success, type = "message", duration = 10)
+        
+        # Relay success to PMx Co-Modeler
+        if(reuse_context && llm_service == "PMx Co-Modeler") {
+          if(show_debugging_msg) message("Relaying success")
+          relay_success <- refine_model_code(
+            model_code                 = current_code$answer,
+            error_message              = "N/A",
+            context                    = current_code,
+            reuse_context              = reuse_context,
+            service                    = llm_service,
+            api_key                    = api_key,
+            api_chat                   = api_chat,
+            user_id                    = user_id_retry,
+            model_gemini               = model_gemini,
+            model_openai               = model_openai,
+            model_anthropic            = model_anthropic,
+            model_openrouter           = model_openrouter,
+            model_openai_compatible    = model_openai_compatible,
+            model_deepseek             = model_deepseek,
+            model_apollo               = model_apollo,
+            model_azure                = model_azure,
+            model_aws                  = model_aws,
+            progress_bar               = 0,
+            max_retries                = max_retries,
+            display_info               = FALSE,
+            temperature                = temperature,
+            seed                       = llm_seed,
+            attempt                    = attempt,
+            system_prompt              = mrgsolve_refine_system_prompt,
+            long_user_prompt           = mrgsolve_refine_long_user_prompt,
+            short_user_prompt          = mrgsolve_refine_short_user_prompt,
+            internal_version           = internal_version,
+            feedback_success           = TRUE, # Model cache purposes
+            debug                      = show_debugging_msg
+          )
+        }
+        
         update_editor(current_code$answer)
         return()
       }
@@ -4312,6 +4385,43 @@ server <- function(input, output, session) {
     if (mrgsolve::is.mrgmod(compilation$result)) {
       # Success on first pass — notify, update editor, and stop
       shiny::showNotification(llm_compile_success, type = "message", duration = 10)
+      
+      # Relay success to PMx Co-Modeler
+      if(reuse_context && llm_service == "PMx Co-Modeler") {
+        if(show_debugging_msg) message("Relaying success")
+        relay_success <- refine_model_code(
+          model_code                 = current_code$answer,
+          error_message              = "N/A",
+          context                    = current_code,
+          reuse_context              = reuse_context,
+          service                    = llm_service,
+          api_key                    = api_key,
+          api_chat                   = api_chat,
+          user_id                    = user_id_retry,
+          model_gemini               = model_gemini,
+          model_openai               = model_openai,
+          model_anthropic            = model_anthropic,
+          model_openrouter           = model_openrouter,
+          model_openai_compatible    = model_openai_compatible,
+          model_deepseek             = model_deepseek,
+          model_apollo               = model_apollo,
+          model_azure                = model_azure,
+          model_aws                  = model_aws,
+          progress_bar               = 0,
+          max_retries                = max_retries,
+          display_info               = FALSE,
+          temperature                = temperature,
+          seed                       = llm_seed,
+          attempt                    = attempt,
+          system_prompt              = mrgsolve_refine_system_prompt,
+          long_user_prompt           = mrgsolve_refine_long_user_prompt,
+          short_user_prompt          = mrgsolve_refine_short_user_prompt,
+          internal_version           = internal_version,
+          feedback_success           = TRUE, # Model cache purposes
+          debug                      = show_debugging_msg
+        )
+      }
+      
       update_editor(current_code$answer)
       return()
     }
@@ -4368,6 +4478,7 @@ server <- function(input, output, session) {
         long_user_prompt           = mrgsolve_refine_long_user_prompt,
         short_user_prompt          = mrgsolve_refine_short_user_prompt,
         internal_version           = internal_version,
+        feedback_success           = FALSE,
         debug                      = show_debugging_msg
       )
       
@@ -4382,6 +4493,43 @@ server <- function(input, output, session) {
       if (mrgsolve::is.mrgmod(compilation$result)) {
         # Success — notify, update editor, and stop
         shiny::showNotification(llm_compile_success, type = "message", duration = 10)
+        
+        # Relay success to PMx Co-Modeler
+        if(reuse_context && llm_service == "PMx Co-Modeler") {
+          if(show_debugging_msg) message("Relaying success")
+          relay_success <- refine_model_code(
+            model_code                 = current_code$answer,
+            error_message              = "N/A",
+            context                    = current_code,
+            reuse_context              = reuse_context,
+            service                    = llm_service,
+            api_key                    = api_key,
+            api_chat                   = api_chat,
+            user_id                    = user_id_retry,
+            model_gemini               = model_gemini,
+            model_openai               = model_openai,
+            model_anthropic            = model_anthropic,
+            model_openrouter           = model_openrouter,
+            model_openai_compatible    = model_openai_compatible,
+            model_deepseek             = model_deepseek,
+            model_apollo               = model_apollo,
+            model_azure                = model_azure,
+            model_aws                  = model_aws,
+            progress_bar               = 0,
+            max_retries                = max_retries,
+            display_info               = FALSE,
+            temperature                = temperature,
+            seed                       = llm_seed,
+            attempt                    = attempt,
+            system_prompt              = mrgsolve_refine_system_prompt,
+            long_user_prompt           = mrgsolve_refine_long_user_prompt,
+            short_user_prompt          = mrgsolve_refine_short_user_prompt,
+            internal_version           = internal_version,
+            feedback_success           = TRUE,
+            debug                      = show_debugging_msg
+          )
+        }
+        
         update_editor(current_code$answer)
         return()
       }

@@ -253,7 +253,7 @@ if(read_pre_baked_databases) {
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Read in and merge NHANES data 
-    # NHANES 1999-2020 (pre-pandemic, until March 2020)
+    # NHANES 1999-2023
     # (https://wwwn.cdc.gov/nchs/nhanes/Default.aspx) 
     # ID, WT, SEX, AGEYR are retained by default.
     # Insert citation notes here in the future
@@ -269,6 +269,7 @@ if(read_pre_baked_databases) {
     nhanes.demogs.H <- read.xport(file.path(database_path, "NHANES", "DEMO_H_NHANES_2013-2014_demographics.xpt"))
     nhanes.demogs.I <- read.xport(file.path(database_path, "NHANES", "DEMO_I_NHANES_2015-2016_demographics.xpt"))
     nhanes.demogs.P <- read.xport(file.path(database_path, "NHANES", "DEMO_P_NHANES_2017-2020_pre_pandemic_demographics.xpt"))
+    nhanes.demogs.L <- read.xport(file.path(database_path, "NHANES", "DEMO_L_NHANES_2021-2023_demographics.xpt"))
     
     nhanes.weight.A <- read.xport(file.path(database_path, "NHANES", "BMX_A_NHANES_1999-2000_body_measures.xpt"))
     nhanes.weight.B <- read.xport(file.path(database_path, "NHANES", "BMX_B_NHANES_2001-2002_body_measures.xpt"))
@@ -280,6 +281,7 @@ if(read_pre_baked_databases) {
     nhanes.weight.H <- read.xport(file.path(database_path, "NHANES", "BMX_H_NHANES_2013-2014_body_measures.xpt"))
     nhanes.weight.I <- read.xport(file.path(database_path, "NHANES", "BMX_I_NHANES_2015-2016_body_measures.xpt"))
     nhanes.weight.P <- read.xport(file.path(database_path, "NHANES", "BMX_P_NHANES_2017-2020_pre_pandemic_body_measures.xpt"))
+    nhanes.weight.L <- read.xport(file.path(database_path, "NHANES", "BMX_L_NHANES_2021-2023_body_measures.xpt"))
     
     # Merge NHANES data
     nhanes.demogs <- bind_rows(nhanes.demogs.A,
@@ -291,7 +293,8 @@ if(read_pre_baked_databases) {
                                nhanes.demogs.G,
                                nhanes.demogs.H,
                                nhanes.demogs.I,
-                               nhanes.demogs.P) %>%
+                               nhanes.demogs.P,
+                               nhanes.demogs.L) %>%
       select(ID = SEQN,
              SEX = RIAGENDR,
              AGEYR = RIDAGEYR)
@@ -305,7 +308,8 @@ if(read_pre_baked_databases) {
                                nhanes.weight.G,
                                nhanes.weight.H,
                                nhanes.weight.I,
-                               nhanes.weight.P) %>% 
+                               nhanes.weight.P,
+                               nhanes.weight.L) %>% 
       select(ID = SEQN,
              WT = BMXWT,
              HT = BMXHT)
