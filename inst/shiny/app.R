@@ -54,7 +54,7 @@ if(standalone_mode) {
   user_id_retry           = "mrgsolve_translator" # For BI-only, must use same user ID to carry same conversation
   reuse_context           = FALSE # Re-use same conversation to keep original context for better re-iteration answers
   model_gemini            = "gemini-3-flash-preview"
-  model_openai            = "gpt-5.2" # "gpt-5-mini"
+  model_openai            = "gpt-5.4" # "gpt-5-mini"
   model_anthropic         = "claude-sonnet-4-6" # "claude-haiku-4-5-20251001" 
   model_openrouter        = "arcee-ai/trinity-large-preview:free"  # "openrouter/free"
   model_openai_compatible = "gpt-5-mini"
@@ -3901,7 +3901,7 @@ server <- function(input, output, session) {
   output$upload_pdf_model_1 <- renderUI({
     if (input$model_select == 'Upload File (AI Translation)') {
       fluidRow(
-        column(width = 7,
+        column(width = 8,
                fileInput("pdffile_model_1",
                          label  = llm_pdffile_label,
                          accept = llm_accept_single_types,
@@ -3909,7 +3909,7 @@ server <- function(input, output, session) {
                          multiple = TRUE
                )
         ),
-        column(width = 5,
+        column(width = 4,
                # Adding a margin to push the checkbox down to align with the file input
                div(style = "margin-top: 25px;", 
                    checkboxInput("locally_parse_model_1", 
@@ -4152,7 +4152,7 @@ server <- function(input, output, session) {
   output$upload_pdf_model_2 <- renderUI({
     if (input$model_select2 == 'Upload File (AI Translation)') {
       fluidRow(
-        column(width = 7,
+        column(width = 8,
                fileInput("pdffile_model_2",
                          label  = llm_pdffile_label,
                          accept = llm_accept_single_types,
@@ -4160,7 +4160,7 @@ server <- function(input, output, session) {
                          multiple = TRUE
                )
         ),
-        column(width = 5,
+        column(width = 4,
                # Adding a margin to push the checkbox down to align with the file input
                div(style = "margin-top: 25px;", 
                    checkboxInput("locally_parse_model_2", 
