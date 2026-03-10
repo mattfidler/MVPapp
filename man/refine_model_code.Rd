@@ -33,6 +33,7 @@ refine_model_code(
   long_user_prompt,
   short_user_prompt,
   internal_version,
+  feedback_success = FALSE,
   debug = TRUE
 )
 }
@@ -85,6 +86,16 @@ refine_model_code(
 \item{seed}{seed number for LLMs, if not reusing context}
 
 \item{attempt}{current attempt number}
+
+\item{system_prompt}{Character. System prompt}
+
+\item{long_user_prompt}{Character. Long user prompt}
+
+\item{short_user_prompt}{Character. Short user prompt}
+
+\item{internal_version}{Logical. Only relevant for BI}
+
+\item{feedback_success}{Logical. Only relevant for BI, and if reuse_context = TRUE}
 
 \item{debug}{Displays debug messages}
 }

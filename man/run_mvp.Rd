@@ -19,7 +19,7 @@ run_mvp(
   user_id_retry = "mrgsolve_translator",
   reuse_context = FALSE,
   model_gemini = "gemini-3-flash-preview",
-  model_openai = "gpt-5.2",
+  model_openai = "gpt-5.4",
   model_anthropic = "claude-sonnet-4-6",
   model_openrouter = "arcee-ai/trinity-large-preview:free",
   model_openai_compatible = "gpt-5.2",
@@ -62,7 +62,7 @@ run_mvp(
 
 \item{model_gemini}{Character. Default gemini-3-flash-preview. Model for Gemini.}
 
-\item{model_openai}{Character. Default gpt-5.2. Model for OpenAI / ChatGPT.}
+\item{model_openai}{Character. Default gpt-5.4. Model for OpenAI / ChatGPT.}
 
 \item{model_anthropic}{Character. Default claude-sonnet-4-6. Model for Anthropic / Claude.}
 
