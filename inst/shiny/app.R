@@ -2582,7 +2582,7 @@ server <- function(input, output, session) {
                           show_note = TRUE)
     
     # Generate dataset and model AFTER a small delay to allow inputs to invalidate properly
-    shinyjs::delay(1000, {
+    shinyjs::delay(1250, {
       shinyjs::click("eval_button")
       shinyjs::click("generate_model")
       shinyjs::click("generate_model2")
@@ -2598,7 +2598,7 @@ server <- function(input, output, session) {
                           show_note = FALSE,
                           selectize_choices  = names(nmdata_cmt_filtered()) %>% sort())
     
-    shinyjs::delay(500, {
+    shinyjs::delay(750, {
       pending_session_restore(FALSE)
       stored_session_state(NULL)
     })
