@@ -71,7 +71,7 @@ run_mvp <- function(appDir                  = system.file("shiny", package = "MV
                     llm_choices             = c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Azure OpenAI", "AWS Bedrock"),
                     api_upload              = NA_character_,
                     api_chat                = NA_character_, 
-                    user_id                 = "mrgsolve_translator",
+                    user_id                 = "MVP_user",
                     reuse_context           = FALSE, # Re-use same conversation to keep original context for better re-iteration answers
                     model_gemini            = "gemini-3-flash-preview",
                     model_openai            = "gpt-5.4", # "gpt-5-mini"
