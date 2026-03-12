@@ -75,7 +75,7 @@ For example, if you want to use Moonshot AI's Kimi K2.5 model as default (i.e. a
 
 `run_mvp(llm_choices = "OpenAI-Compatible", model_openai_compatible = "kimi-k2.5", api_chat = "https://api.moonshot.ai/v1/chat/completions")`  
 
-In another second example, if you already have Claude API access, and just want to change the default model, you could try something like:  
+In a second example, if you already have Claude API access, and just want to change the default model, you could try something like:  
 
 `run_mvp(llm_choices = "Claude", model_anthropic = "claude-haiku-4-5-20251001")`  
 
@@ -85,7 +85,7 @@ In addition, as the advancement of models happens frequently (on a time scale of
 
 ## Usage  
 
-From the Model Selection drop-down list, choose the option called "Upload File (AI Translation)". Next, all you need to do is to upload a file (or multiple files, we currently supports PDF or text files `.txt/.mod/.ctl`), click the "Send" button, and then wait for the results to be generated, which takes about a minute.  
+From the Model Selection drop-down list, choose the option called "Upload File (AI Translation)". Next, all you need to do is to upload a file (or multiple files, we currently support PDF or text files `.txt/.mod/.ctl`), click the "Send" button, and then wait for the results to be generated, which takes about a minute.  
 
 When the results become available, the code editor will be updated and then you can proceed as normal. If the default settings are not to your preference, you can click on the "Gear" button to further customize settings.    
 
@@ -97,7 +97,7 @@ When the results become available, the code editor will be updated and then you 
 
 The user has the option to bypass uploading of files, and instead parse the text locally and include that as part of the prompt to be sent to the LLM (currently supports PDF and text files). The advantage is that this is usually quicker, and with a reduced token usage (i.e. cheaper). The downside is that if the file contains lots of images such as model schematics, the contents will not be extracted and thus the response may become less accurate, compared to uploading the file. In addition, not all providers allow separate uploading of (PDF) files. If that is the case, MVP will automatically parse the file contents locally.
 
-`r "\U0001F4A1"` Whether it makes sense to parse locally is __highly dependent__ on the file itself, e.g. in MVP, NONMEM control streams (`.mod/.ctl`) are considered equivalent to text files, and will be automatically locally parsed since there is no advantage to be gained by uploading it.
+`r "\U0001F4A1"` Whether it makes sense to parse locally is __highly dependent__ on the file itself, e.g. in MVP, NONMEM control streams (`.mod/.ctl`) are considered equivalent to text files (it is converted internally to have a `.txt` extension before uploading to ensure compatibility). Therefore, you may consider locally parsing small text files since there is no advantage to be gained by uploading it. An exception to this would be if there are context window limits which prevents lots of text to fit properly within the prompt.  
 
 ### Automatic Retries
 
@@ -118,7 +118,7 @@ After each LLM response has been received, a notification will be displayed on t
 
 + The `prompts_path` argument when launching `run_mvp()` allows the user to provide their own prompts. By default, the included `prompts.R` file is used (located in the `/shiny` subfolder of `MVPapp`, whereby the path can be located by `find.package("MVPapp")`). The prompts are fine-tuned based on trial-and-error, and may change in newer versions to improve first-try success rates based on user feedback.  It is recommended that users make a copy of the file before making adjustments.  
 + A seed of `42` and a temperature setting of `0` is used by default. Please note that the use of a seed or setting a temperature to 0 may not necessarily guarantee reproducibility (depending on the provider).  
-+ While the feature is currently limited to translating and compiling into mrgsolve, in principle it can be quite easily adapted to any other language. The `model_lang` argument controls the output language, which is set to `mrgsolve` by default. For testing purposes, `nonmem` and `rxode2` is also available (MVP app does not support executing NONMEM or RxODE2, so retries will be automatically set to 0).     
++ While the feature is best supported by translating and compiling into mrgsolve, in principle it can be quite easily adapted to any other language. The `model_lang` argument controls the output language, which is set to `mrgsolve` by default. For testing purposes, `nonmem` and `rxode2` is also available (MVP app does not support executing NONMEM or RxODE2, so retries will be automatically set to 0).     
 + If the launch argument `show_debugging_msg = TRUE`, the responses will be saved as the R objects `llm_result` (for initial translation)  and `llm_refine` (for retries) in the global environment for review.    
 
 ## Performance Evaluation  

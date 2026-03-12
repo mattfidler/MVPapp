@@ -5822,8 +5822,8 @@ translate_model_code <- function(ready_path,
     new_path <- paste0(file_path, ".txt")
     file.copy(file_path, new_path)
     file_path <- new_path
-    locally_parse_file <- TRUE
-    safely_showNotification(paste0("Text file detected, will be parsed locally to bypass file upload."))
+    #locally_parse_file <- TRUE
+    #safely_showNotification(paste0("Text file detected, will be parsed locally to bypass file upload."))
   } else {
     detected_type <- mime::guess_type(file_name)
   }
