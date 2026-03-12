@@ -26,6 +26,8 @@ translate_model_code(
   seed = 42,
   locally_parse_file = FALSE,
   model_lang = "mrgsolve",
+  deep_pdfscan = FALSE,
+  force_parse = FALSE,
   mrgsolve_system_prompt,
   mrgsolve_long_user_prompt,
   mrgsolve_short_user_prompt,
@@ -84,6 +86,10 @@ for MIME type detection). If \code{NULL}, derived from \code{ready_path}.}
 \item{locally_parse_file}{if TRUE, extracts text locally and includes in prompt instead of uploading file}
 
 \item{model_lang}{Either "mrgsolve" or "nonmem" (changes the prompt)}
+
+\item{deep_pdfscan}{Use Vision to extract image data (BI only)}
+
+\item{force_parse}{Force parsing (BI only)}
 
 \item{mrgsolve_system_prompt}{String for mrgsolve system prompt}
 

@@ -18,10 +18,9 @@
 #' @param use_bi_styling Logical. Default FALSE. Set to TRUE to insert BI logo (deprecated - currently inactive).
 #' @param pw_models_path Character. Default NA_character_. Provide a path to source password-gated models.
 #' @param llm_choices Character. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "Deepseek", "Azure OpenAI", "AWS Bedrock"
-#' @param api_upload Character. Default NA_character_. API upload URL when using Dify-based workflows
-#' @param api_chat Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers
-#' @param user_id Character. Default mrgsolve_translator. User ID for LLMs (BI-only).
-#' @param user_id_retry Character. Default mrgsolve_translator. User ID for submitting retries to LLMs (BI-only).
+#' @param api_upload Character. Default NA_character_. API upload URL when using Dify-based workflows (BI-only)
+#' @param api_chat Character. Default NA_character_. API chat URL required when using OpenAI-Compatible providers
+#' @param user_id Character. Default MVP_user. User ID for LLMs
 #' @param reuse_context Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.
 #' @param model_gemini Character. Default gemini-3-flash-preview. Model for Gemini.
 #' @param model_openai Character. Default gpt-5.4. Model for OpenAI / ChatGPT.
@@ -73,7 +72,6 @@ run_mvp <- function(appDir                  = system.file("shiny", package = "MV
                     api_upload              = NA_character_,
                     api_chat                = NA_character_, 
                     user_id                 = "mrgsolve_translator",
-                    user_id_retry           = "mrgsolve_translator", # Must use same user ID to carry same conversation, previously was "mrgsolve_refiner"
                     reuse_context           = FALSE, # Re-use same conversation to keep original context for better re-iteration answers
                     model_gemini            = "gemini-3-flash-preview",
                     model_openai            = "gpt-5.4", # "gpt-5-mini"
@@ -102,7 +100,6 @@ run_mvp <- function(appDir                  = system.file("shiny", package = "MV
     api_upload              = api_upload,             
     api_chat                = api_chat,
     user_id                 = user_id,
-    user_id_retry           = user_id_retry,
     reuse_context           = reuse_context,
     model_gemini            = model_gemini,
     model_openai            = model_openai,

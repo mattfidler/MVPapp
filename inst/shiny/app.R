@@ -50,8 +50,7 @@ if(standalone_mode) {
   llm_choices             = c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Azure OpenAI", "AWS Bedrock")
   api_upload              = NA_character_  
   api_chat                = NA_character_ 
-  user_id                 = "mrgsolve_translator" # For BI-only
-  user_id_retry           = "mrgsolve_translator" # For BI-only, must use same user ID to carry same conversation
+  user_id                 = "MVP_user" # 
   reuse_context           = FALSE # Re-use same conversation to keep original context for better re-iteration answers
   model_gemini            = "gemini-3-flash-preview"
   model_openai            = "gpt-5.4" # "gpt-5-mini"
@@ -64,7 +63,7 @@ if(standalone_mode) {
   model_aws               = "anthropic.claude-sonnet-4-6"
   temperature             = 0
   llm_seed                = 42
-  model_lang              = "mrgsolve" # "mrgsolve", "nonmem", "rxode2" (testing purposes)
+  model_lang              = c("mrgsolve", "nonmem", "rxode2")
   prompts_path            = NA_character_ 
   show_debugging_msg      = TRUE
 }
@@ -85,9 +84,9 @@ if(!exists("user_id"))                 {user_id                  <- "mrgsolve_tr
 if(!exists("user_id_retry"))           {user_id_retry            <- "mrgsolve_translator"}
 if(!exists("reuse_context"))           {reuse_context            <- FALSE}
 if(!exists("model_gemini"))            {model_gemini             <- "gemini-3-flash-preview"}
-if(!exists("model_openai"))            {model_openai             <- "gpt-5.2"}
+if(!exists("model_openai"))            {model_openai             <- "gpt-5.4"}
 if(!exists("model_anthropic"))         {model_anthropic          <- "claude-sonnet-4-6"}
-if(!exists("model_openrouter"))        {model_openrouter         <- "openrouter/free"}
+if(!exists("model_openrouter"))        {model_openrouter         <- "arcee-ai/trinity-large-preview:free"}
 if(!exists("model_openai_compatible")) {model_openai_compatible  <- "gpt-5-mini"}
 if(!exists("model_deepseek"))          {model_deepseek           <- "deepseek-reasoner"}
 if(!exists("model_apollo"))            {model_apollo             <- "claude_4_6_sonnet"}
@@ -95,7 +94,7 @@ if(!exists("model_azure"))             {model_azure              <- "gpt-5.2"}
 if(!exists("model_aws"))               {model_aws                <- "anthropic.claude-sonnet-4-6"}
 if(!exists("temperature"))             {temperature              <- 0}
 if(!exists("llm_seed"))                {llm_seed                 <- 42}
-if(!exists("model_lang"))              {model_lang               <- "mrgsolve"}
+if(!exists("model_lang"))              {model_lang               <- c("mrgsolve", "nonmem", "rxode2")}
 if(!exists("prompts_path"))            {prompts_path             <- "https://github.com/stevechoy/MVPapp/raw/refs/heads/master/inst/shiny/prompts.R"} 
 if(!exists("show_debugging_msg"))      {show_debugging_msg       <- TRUE}
 
@@ -2443,7 +2442,7 @@ ui <- shiny::navbarPage(
                                title = 'Changelog', status = 'primary', solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE,
                                p('Please visit the ', a(href = "https://github.com/stevechoy/MVPapp/releases", "Github release page", target = "_blank"), ' for more information.'),
                                htmltools::br(),
-                               p('v0.4.0 (2026-03-02) - Experimental feature of parsing external files to generate mrgsolve model code. Save and restore session support. Performance improvements.'),
+                               p('v0.4.0 (2026-03-11) - Experimental feature of parsing external files to generate mrgsolve model code. Save and restore session support. Performance improvements.'),
                                p('v0.3.5 (2026-02-04) - Dose info now displays correctly for all doses in Individual Plots'),
                                p('v0.3.4 (2025-12-02) - Covariate histograms feature in Data Exploration.'),
                                p('v0.3.3 (2025-07-31) - NHANES updated to include 2021-2023. BMI filter for external databases. Minor bug fixes.'),
@@ -2579,10 +2578,11 @@ server <- function(input, output, session) {
     
     stored_session_state(state)
     pending_session_restore(TRUE)
-    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, show_note = TRUE)
+    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, 
+                          show_note = TRUE)
     
     # Generate dataset and model AFTER a small delay to allow inputs to invalidate properly
-    shinyjs::delay(1500, {
+    shinyjs::delay(1000, {
       shinyjs::click("eval_button")
       shinyjs::click("generate_model")
       shinyjs::click("generate_model2")
@@ -2594,9 +2594,14 @@ server <- function(input, output, session) {
     shiny::req(pending_session_restore())
     shiny::req(model_1_checkpoint$sim_generated_model_1 | model_2_checkpoint$sim_generated_model_2)
     
-    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, show_note = FALSE)
-    pending_session_restore(FALSE)
-    stored_session_state(NULL)
+    restore_session_state(stored_session_state(), input, session, rv, uploaded_data_override, 
+                          show_note = FALSE,
+                          selectize_choices  = names(nmdata_cmt_filtered()) %>% sort())
+    
+    shinyjs::delay(500, {
+      pending_session_restore(FALSE)
+      stored_session_state(NULL)
+    })
   }, priority = -100)
   
   if(!is.na(authentication_code)) {
@@ -2626,6 +2631,80 @@ server <- function(input, output, session) {
       }
     })
   } # end authentication
+  
+  # Default LLM settings
+  default_llm_settings <- list(
+    llm_choices             = first(llm_choices),
+    api_upload              = api_upload,
+    api_chat                = api_chat,
+    user_id                 = user_id,
+    reuse_context           = reuse_context,
+    model_gemini            = model_gemini,
+    model_openai            = model_openai,
+    model_anthropic         = model_anthropic,
+    model_openrouter        = model_openrouter,
+    model_openai_compatible = model_openai_compatible,
+    model_deepseek          = model_deepseek,
+    model_apollo            = model_apollo,
+    model_azure             = model_azure,
+    model_aws               = model_aws,
+    temperature             = temperature,
+    llm_seed                = llm_seed,
+    model_lang              = first(model_lang),
+    locally_parse           = FALSE,
+    max_retries             = 2,
+    deep_pdfscan            = FALSE,
+    force_parse             = FALSE
+  )
+  
+  # Reactive values to store LLM settings
+  llm_settings_model_1 <- reactiveValues(
+    llm_choices             = default_llm_settings$llm_choices,
+    api_upload              = default_llm_settings$api_upload,
+    api_chat                = default_llm_settings$api_chat,
+    user_id                 = default_llm_settings$user_id,
+    reuse_context           = default_llm_settings$reuse_context,
+    model_gemini            = default_llm_settings$model_gemini,
+    model_openai            = default_llm_settings$model_openai,
+    model_anthropic         = default_llm_settings$model_anthropic,
+    model_openrouter        = default_llm_settings$model_openrouter,
+    model_openai_compatible = default_llm_settings$model_openai_compatible,
+    model_deepseek          = default_llm_settings$model_deepseek,
+    model_apollo            = default_llm_settings$model_apollo,
+    model_azure             = default_llm_settings$model_azure,
+    model_aws               = default_llm_settings$model_aws,
+    temperature             = default_llm_settings$temperature,
+    llm_seed                = default_llm_settings$llm_seed,
+    model_lang              = default_llm_settings$model_lang,
+    locally_parse           = default_llm_settings$locally_parse,
+    max_retries             = default_llm_settings$max_retries,
+    deep_pdfscan            = default_llm_settings$deep_pdfscan,
+    force_parse             = default_llm_settings$force_parse
+  )
+  
+  llm_settings_model_2 <- reactiveValues(
+    llm_choices             = default_llm_settings$llm_choices,
+    api_upload              = default_llm_settings$api_upload,
+    api_chat                = default_llm_settings$api_chat,
+    user_id                 = default_llm_settings$user_id,
+    reuse_context           = default_llm_settings$reuse_context,
+    model_gemini            = default_llm_settings$model_gemini,
+    model_openai            = default_llm_settings$model_openai,
+    model_anthropic         = default_llm_settings$model_anthropic,
+    model_openrouter        = default_llm_settings$model_openrouter,
+    model_openai_compatible = default_llm_settings$model_openai_compatible,
+    model_deepseek          = default_llm_settings$model_deepseek,
+    model_apollo            = default_llm_settings$model_apollo,
+    model_azure             = default_llm_settings$model_azure,
+    model_aws               = default_llm_settings$model_aws,
+    temperature             = default_llm_settings$temperature,
+    llm_seed                = default_llm_settings$llm_seed,
+    model_lang              = default_llm_settings$model_lang,
+    locally_parse           = default_llm_settings$locally_parse,
+    max_retries             = default_llm_settings$max_retries,
+    deep_pdfscan            = default_llm_settings$deep_pdfscan,
+    force_parse             = default_llm_settings$force_parse
+  )
   
   # Page 1 Data Input ----
   # Using debounce to wait for inactivity on textInput
@@ -3901,20 +3980,12 @@ server <- function(input, output, session) {
   output$upload_pdf_model_1 <- renderUI({
     if (input$model_select == 'Upload File (AI Translation)') {
       fluidRow(
-        column(width = 8,
+        column(width = 12,
                fileInput("pdffile_model_1",
-                         label  = llm_pdffile_label,
-                         accept = llm_accept_single_types,
-                         width = "100%",
+                         label    = llm_pdffile_label,
+                         accept   = llm_accept_single_types,
+                         width    = "100%",
                          multiple = TRUE
-               )
-        ),
-        column(width = 4,
-               # Adding a margin to push the checkbox down to align with the file input
-               div(style = "margin-top: 25px;", 
-                   checkboxInput("locally_parse_model_1", 
-                                 label = llm_parse_locally, 
-                                 value = FALSE)
                )
         )
       )
@@ -3923,40 +3994,356 @@ server <- function(input, output, session) {
   
   output$select_llm_model_1 <- renderUI({
     if (input$model_select == 'Upload File (AI Translation)') {
-      tagList(
-        div(style = "margin-top: 60px;"), 
-        
-        fluidRow(
-          column(width = 7,
-                 selectInput('llm_model_1', 
-                             label = llm_choices_label,
-                             choices = llm_choices,
-                             selected = first(llm_choices),
-                             width = "100%",
-                             selectize = FALSE)
-          ),
-          column(width = 5,
-                 selectInput('max_retries_model_1', 
-                             label = llm_max_retries_label,
-                             choices = c(0, 1, 2, 3),
-                             selected = 2,
-                             width = "100%",
-                             selectize = FALSE)
-          )
+      fluidRow(
+        column(width = 12,
+               div(style = "margin-top: 40px; display: flex; justify-content: flex-end; gap: 8px;",
+                   actionButton("customize_llm_model_1", label = NULL, icon = icon("gear"), class = "btn-secondary", title = "Customize Translation Settings"),
+                   actionButton("send_to_llm_model_1",   label = NULL, icon = icon("paper-plane"),  class = "btn-primary", title = "Send to LLM for Translation")
+               )
         )
       )
     }
   })
   
-  observeEvent(c(input$pdffile_model_1, input$llm_model_1, input$locally_parse_model_1), {
+  output$model_name_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 == "Gemini") {
+      textInput('model_gemini_model_1',
+                label = "Model (Gemini)",
+                value = llm_settings_model_1$model_gemini
+      )      
+    } else if (input$llm_model_1 == "Claude") {
+      textInput('model_anthropic_model_1',
+                label = "Model (Claude)",
+                value = llm_settings_model_1$model_anthropic
+      )     
+    } else if (input$llm_model_1 == "OpenAI") {
+      textInput('model_openai_model_1',
+                label = "Model (OpenAI)",
+                value = llm_settings_model_1$model_openai
+      )     
+    } else if (input$llm_model_1 == "OpenRouter") {
+      textInput('model_openrouter_model_1',
+                label = "Model (OpenRouter)",
+                value = llm_settings_model_1$model_openrouter
+      )
+    } else if (input$llm_model_1 == "OpenAI-Compatible") {
+      textInput('model_openai_compatible_model_1',
+                label = "Model (OpenAI-Compatible)",
+                value = llm_settings_model_1$model_openai_compatible
+      )
+    } else if (input$llm_model_1 == "Azure OpenAI") {
+      textInput('model_azure_model_1',
+                label = "Model (Azure)",
+                value = llm_settings_model_1$model_azure
+      )      
+    } else if (input$llm_model_1 == "AWS Bedrock") {
+      textInput('model_aws_model_1',
+                label = "Model (AWS Bedrock)",
+                value = llm_settings_model_1$model_aws
+      )
+    } else if (input$llm_model_1 == "DeepSeek") {
+      textInput('model_deepseek_model_1',
+                label = "Model (DeepSeek)",
+                value = llm_settings_model_1$model_deepseek
+      )
+    } else if (input$llm_model_1 == "Test Provider" | input$llm_model_1 == "Apollo") {
+      textInput('model_apollo_model_1',
+                label = "Model (Apollo)",
+                value = llm_settings_model_1$model_apollo
+      )
+    }
+  })
+  
+  output$api_upload_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 == "PMx Co-Modeler" | input$llm_model_1 == "EXP") {
+      # textInput('api_upload_model_1',
+      #           label = "API Upload URL",
+      #           value = llm_settings_model_1$api_upload,
+      #           placeholder = "API Chat URL (BI-only)"
+      # )
+    }
+  })
+  
+  output$api_chat_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 == "OpenAI-Compatible") {
+      textInput('api_chat_model_1',
+                label = "API Chat URL",
+                value = llm_settings_model_1$api_chat,
+                placeholder = "API Chat URL"
+      )
+    }    
+  })
+  
+  output$user_id_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 != "PMx Co-Modeler" & input$llm_model_1 != "EXP") {
+      textInput('user_id_model_1',
+                label = "User ID",
+                value = llm_settings_model_1$user_id
+      )
+    }    
+  })
+  
+  output$temperature_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 != "PMx Co-Modeler" & input$llm_model_1 != "EXP") {
+      sliderInput('temperature_model_1',
+                  label = llm_temp_label,
+                  value = llm_settings_model_1$temperature,
+                  min = 0,
+                  max = 1,
+                  step = 0.1
+      )
+    }    
+  })
+  
+  output$llm_seed_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 != "PMx Co-Modeler" & input$llm_model_1 != "EXP") {
+      numericInput('llm_seed_model_1',
+                   label = llm_seed_label,
+                   value = llm_settings_model_1$llm_seed
+      )
+    }    
+  })
+  
+  output$deep_pdfscan_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 == "PMx Co-Modeler" | input$llm_model_1 == "EXP") {
+      checkboxInput('deep_pdfscan_model_1',
+                    label = llm_deep_pdfscan_label,
+                    value = llm_settings_model_1$deep_pdfscan
+      )
+    }    
+  })
+  
+  output$force_parse_ui_model_1 <- renderUI({
+    shiny::req(input$llm_model_1) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_1 == "PMx Co-Modeler" | input$llm_model_1 == "EXP") {
+      checkboxInput('force_parse_model_1',
+                    label = llm_force_parse_label,
+                    value = llm_settings_model_1$force_parse
+      )
+    }    
+  })
+  
+  # Show a modal dialog for customizing llm settings
+  observeEvent(input$customize_llm_model_1, {
+    showModal(
+      modalDialog(
+        title = "Customize Translation Settings",
+        easyClose = TRUE, fade = TRUE,
+        fluidRow(
+          column(width = 4,
+                 selectInput('llm_model_1',
+                             label = llm_choices_label,
+                             choices = llm_choices,
+                             selected = llm_settings_model_1$llm_choices,
+                             width = "100%",
+                             selectize = FALSE),
+                 uiOutput("model_name_ui_model_1"),
+                 uiOutput("api_upload_ui_model_1"),
+                 uiOutput("api_chat_ui_model_1"),
+                 uiOutput("user_id_ui_model_1")
+          ),
+          column(width = 4,
+                 selectInput('max_retries_model_1',
+                             label = llm_max_retries_label,
+                             choices = c(0, 1, 2, 3),
+                             selected = llm_settings_model_1$max_retries,
+                             width = "100%",
+                             selectize = FALSE),
+                 uiOutput("temperature_ui_model_1"),
+                 uiOutput("llm_seed_ui_model_1"),
+                 uiOutput("deep_pdfscan_ui_model_1"),
+                 uiOutput("force_parse_ui_model_1")
+          ),
+          column(width = 4,
+                 selectInput('model_lang_model_1',
+                             label = llm_translate_label,
+                             choices = model_lang,
+                             selected = llm_settings_model_1$model_lang,
+                             width = "100%",
+                             selectize = FALSE
+                 ),
+                 checkboxInput('locally_parse_model_1',
+                               label = llm_parse_locally,
+                               value = llm_settings_model_1$locally_parse
+                 ),
+                 checkboxInput('reuse_context_model_1',
+                               label = llm_memory_label,
+                               value = llm_settings_model_1$reuse_context
+                 )
+          ),          
+        ),
+        footer = tagList(
+          actionButton("reset_llm_model_1", "Reset", class = "btn-warning"),
+          actionButton("apply_model_1", "Apply", class = "btn-success"),
+          modalButton("OK")
+        )
+      )
+    )
+  })
+  
+  # Reset settings to default values
+  observeEvent(input$reset_llm_model_1, {
+    # Reset the reactive values
+    llm_settings_model_1$llm_choices             <- default_llm_settings$llm_choices
+    llm_settings_model_1$api_upload              <- default_llm_settings$api_upload
+    llm_settings_model_1$api_chat                <- default_llm_settings$api_chat
+    llm_settings_model_1$user_id                 <- default_llm_settings$user_id
+    llm_settings_model_1$reuse_context           <- default_llm_settings$reuse_context
+    llm_settings_model_1$model_gemini            <- default_llm_settings$model_gemini
+    llm_settings_model_1$model_openai            <- default_llm_settings$model_openai
+    llm_settings_model_1$model_anthropic         <- default_llm_settings$model_anthropic
+    llm_settings_model_1$model_openrouter        <- default_llm_settings$model_openrouter
+    llm_settings_model_1$model_openai_compatible <- default_llm_settings$model_openai_compatible
+    llm_settings_model_1$model_deepseek          <- default_llm_settings$model_deepseek
+    llm_settings_model_1$model_apollo            <- default_llm_settings$model_apollo
+    llm_settings_model_1$model_azure             <- default_llm_settings$model_azure
+    llm_settings_model_1$model_aws               <- default_llm_settings$model_aws
+    llm_settings_model_1$temperature             <- default_llm_settings$temperature
+    llm_settings_model_1$llm_seed                <- default_llm_settings$llm_seed
+    llm_settings_model_1$model_lang              <- default_llm_settings$model_lang
+    llm_settings_model_1$locally_parse           <- default_llm_settings$locally_parse
+    llm_settings_model_1$max_retries             <- default_llm_settings$max_retries
+    llm_settings_model_1$deep_pdfscan            <- default_llm_settings$deep_pdfscan
+    llm_settings_model_1$force_parse             <- default_llm_settings$force_parse
+    
+    # Update the modal input fields, BI-only
+    updateSelectInput(session, "llm_model_1",                    selected = default_llm_settings$llm_choices)
+    updateSelectInput(session, "max_retries_model_1",            selected = default_llm_settings$max_retries)
+    updateSelectInput(session, "model_lang_model_1",             selected = default_llm_settings$model_lang)
+    updateCheckboxInput(session, "deep_pdfscan_model_1",            value = default_llm_settings$deep_pdfscan)
+    updateCheckboxInput(session, "force_parse_model_1",             value = default_llm_settings$force_parse)
+    
+    # More general modals
+    updateTextInput(session, "api_upload_model_1",                  value = default_llm_settings$api_upload)
+    updateTextInput(session, "api_chat_model_1",                    value = default_llm_settings$api_chat)
+    updateTextInput(session, "user_id_model_1",                     value = default_llm_settings$user_id)
+    updateCheckboxInput(session, "reuse_context_model_1",           value = default_llm_settings$reuse_context)
+    updateTextInput(session, "model_gemini_model_1",                value = default_llm_settings$model_gemini)
+    updateTextInput(session, "model_openai_model_1",                value = default_llm_settings$model_openai)
+    updateTextInput(session, "model_anthropic_model_1",             value = default_llm_settings$model_anthropic)
+    updateTextInput(session, "model_openrouter_model_1",            value = default_llm_settings$model_openrouter)
+    updateTextInput(session, "model_openai_compatible_model_1",     value = default_llm_settings$model_openai_compatible)
+    updateTextInput(session, "model_deepseek_model_1",              value = default_llm_settings$model_deepseek)
+    updateTextInput(session, "model_apollo_model_1",                value = default_llm_settings$model_apollo)
+    updateTextInput(session, "model_azure_model_1",                 value = default_llm_settings$model_azure)
+    updateTextInput(session, "model_aws_model_1",                   value = default_llm_settings$model_aws)
+    updateSliderInput(session, "temperature_model_1",               value = default_llm_settings$temperature)
+    updateNumericInput(session, "llm_seed_model_1",                 value = default_llm_settings$llm_seed)
+  })
+  
+  # Apply new settings to update the llm_settings reactive
+  observeEvent(input$apply_model_1, {
+    # Always-visible inputs — safe to update unconditionally
+    llm_settings_model_1$llm_choices  <- input$llm_model_1
+    llm_settings_model_1$max_retries  <- input$max_retries_model_1
+    llm_settings_model_1$model_lang   <- input$model_lang_model_1
+    llm_settings_model_1$locally_parse <- input$locally_parse_model_1
+    llm_settings_model_1$reuse_context <- input$reuse_context_model_1
+    
+    # Conditionally visible inputs — only update if the input exists
+    if(!is.null(input$api_upload_model_1))              llm_settings_model_1$api_upload              <- input$api_upload_model_1
+    if(!is.null(input$api_chat_model_1))                llm_settings_model_1$api_chat                <- input$api_chat_model_1
+    if(!is.null(input$user_id_model_1))                 llm_settings_model_1$user_id                 <- input$user_id_model_1
+    if(!is.null(input$model_gemini_model_1))            llm_settings_model_1$model_gemini            <- input$model_gemini_model_1
+    if(!is.null(input$model_openai_model_1))            llm_settings_model_1$model_openai            <- input$model_openai_model_1
+    if(!is.null(input$model_anthropic_model_1))         llm_settings_model_1$model_anthropic         <- input$model_anthropic_model_1
+    if(!is.null(input$model_openrouter_model_1))        llm_settings_model_1$model_openrouter        <- input$model_openrouter_model_1
+    if(!is.null(input$model_openai_compatible_model_1)) llm_settings_model_1$model_openai_compatible <- input$model_openai_compatible_model_1
+    if(!is.null(input$model_deepseek_model_1))          llm_settings_model_1$model_deepseek          <- input$model_deepseek_model_1
+    if(!is.null(input$model_apollo_model_1))            llm_settings_model_1$model_apollo            <- input$model_apollo_model_1
+    if(!is.null(input$model_azure_model_1))             llm_settings_model_1$model_azure             <- input$model_azure_model_1
+    if(!is.null(input$model_aws_model_1))               llm_settings_model_1$model_aws               <- input$model_aws_model_1
+    if(!is.null(input$temperature_model_1))             llm_settings_model_1$temperature             <- input$temperature_model_1
+    if(!is.null(input$llm_seed_model_1))                llm_settings_model_1$llm_seed                <- input$llm_seed_model_1
+    if(!is.null(input$deep_pdfscan_model_1))            llm_settings_model_1$deep_pdfscan            <- input$deep_pdfscan_model_1
+    if(!is.null(input$force_parse_model_1))             llm_settings_model_1$force_parse             <- input$force_parse_model_1
+    
+    # Update the modal input fields, BI-only
+    updateSelectInput(session, "llm_model_1",                    selected = llm_settings_model_1$llm_choices)
+    updateSelectInput(session, "max_retries_model_1",            selected = llm_settings_model_1$max_retries)
+    updateSelectInput(session, "model_lang_model_1",             selected = llm_settings_model_1$model_lang)
+    if(llm_settings_model_1$llm_choices == "PMx Co-Modeler" | llm_settings_model_1$llm_choices == "EXP") {
+      updateCheckboxInput(session, "deep_pdfscan_model_1",          value = llm_settings_model_1$deep_pdfscan)
+      updateCheckboxInput(session, "force_parse_model_1",           value = llm_settings_model_1$force_parse)
+    }
+    # More general modals
+    #updateTextInput(session, "api_upload_model_1",               selected = llm_settings_model_1$api_upload)
+    
+    if(llm_settings_model_1$llm_choices == "OpenAI-Compatible") {
+      updateTextInput(session, "api_chat_model_1",                    value = llm_settings_model_1$api_chat)
+    }
+    updateTextInput(session, "user_id_model_1",                     value = llm_settings_model_1$user_id)
+    updateCheckboxInput(session, "reuse_context_model_1",           value = llm_settings_model_1$reuse_context)
+    updateTextInput(session, "model_gemini_model_1",                value = llm_settings_model_1$model_gemini)
+    updateTextInput(session, "model_openai_model_1",                value = llm_settings_model_1$model_openai)
+    updateTextInput(session, "model_anthropic_model_1",             value = llm_settings_model_1$model_anthropic)
+    updateTextInput(session, "model_openrouter_model_1",            value = llm_settings_model_1$model_openrouter)
+    updateTextInput(session, "model_openai_compatible_model_1",     value = llm_settings_model_1$model_openai_compatible)
+    updateTextInput(session, "model_deepseek_model_1",              value = llm_settings_model_1$model_deepseek)
+    updateTextInput(session, "model_apollo_model_1",                value = llm_settings_model_1$model_apollo)
+    updateTextInput(session, "model_azure_model_1",                 value = llm_settings_model_1$model_azure)
+    updateTextInput(session, "model_aws_model_1",                   value = llm_settings_model_1$model_aws)
+    updateSliderInput(session, "temperature_model_1",               value = llm_settings_model_1$temperature)
+    updateNumericInput(session, "llm_seed_model_1",                 value = llm_settings_model_1$llm_seed)
+  })
+  
+  observeEvent(input$send_to_llm_model_1, {
+    shiny::req(input$pdffile_model_1)
     if(!llm_packages_available) {
       showNotification("ERROR: Please install the 'ellmer' and 'pdftools' packages to use this functionality.", type = "error", duration = 10)
       return(NULL)
     }
     current_code     <- NULL
-    llm_service      <- input$llm_model_1
+    llm_service      <- first(llm_settings_model_1$llm_choices)
     api_key          <- get_api_key(llm_service)
     key_name_env_var <- get_api_key_name(llm_service)
+    
+    ## Creating short-hand based on LLM settings reactives
+    api_upload                 <- llm_settings_model_1$api_upload
+    api_chat                   <- llm_settings_model_1$api_chat
+    user_id                    <- llm_settings_model_1$user_id
+    reuse_context              <- llm_settings_model_1$reuse_context
+    model_gemini               <- llm_settings_model_1$model_gemini
+    model_openai               <- llm_settings_model_1$model_openai
+    model_anthropic            <- llm_settings_model_1$model_anthropic
+    model_openrouter           <- llm_settings_model_1$model_openrouter
+    model_openai_compatible    <- llm_settings_model_1$model_openai_compatible
+    model_deepseek             <- llm_settings_model_1$model_deepseek
+    model_apollo               <- llm_settings_model_1$model_apollo
+    model_azure                <- llm_settings_model_1$model_azure
+    model_aws                  <- llm_settings_model_1$model_aws
+    #display_info               <- TRUE
+    temperature                <- llm_settings_model_1$temperature
+    llm_seed                   <- llm_settings_model_1$llm_seed
+    model_lang                 <- llm_settings_model_1$model_lang
+    locally_parse              <- llm_settings_model_1$locally_parse
+    deep_pdfscan               <- llm_settings_model_1$deep_pdfscan
+    force_parse                <- llm_settings_model_1$force_parse
+    max_retries                <- as.numeric(llm_settings_model_1$max_retries %||% 0)
+    #internal_version           <- internal_version
+    
+    
+    if(show_debugging_msg) print(paste0("api_upload: ", api_upload))
+    if(show_debugging_msg) print(paste0("api_chat: ", api_chat))
+    if(show_debugging_msg) print(paste0("deep_pdfscan: ", deep_pdfscan))
+    if(show_debugging_msg) print(paste0("force_parse: ", force_parse))
+    if(show_debugging_msg) print(paste0("user_id: ", user_id))
+    if(show_debugging_msg) print(paste0("max_retries: ", max_retries))
     
     # Validate API key first
     if (is.null(api_key) || api_key == "") {
@@ -4005,6 +4392,8 @@ server <- function(input, output, session) {
       if (is.null(compilation$result)) compilation$error else compilation$result$out$stderr
     }
     
+    if(show_debugging_msg) message("Beginning translation")
+    
     # 1. Initial Translation
     current_code <- translate_model_code(
       ready_path                 = ready_path,
@@ -4026,8 +4415,10 @@ server <- function(input, output, session) {
       display_info               = TRUE,
       temperature                = temperature,
       seed                       = llm_seed,
-      locally_parse_file         = input$locally_parse_model_1,
+      locally_parse_file         = locally_parse,
       model_lang                 = model_lang,
+      deep_pdfscan               = deep_pdfscan,
+      force_parse                = force_parse,
       mrgsolve_system_prompt     = mrgsolve_translation_system_prompt,
       mrgsolve_long_user_prompt  = mrgsolve_translation_long_user_prompt,
       mrgsolve_short_user_prompt = mrgsolve_translation_short_user_prompt,
@@ -4048,8 +4439,6 @@ server <- function(input, output, session) {
     if(model_lang != "mrgsolve") {
       max_retries     <- 0
       shiny::showNotification(paste0("No Retries when translating to ", model_lang, "."), type = "message", duration = 10)
-    } else {
-      max_retries     <- as.numeric(input$max_retries_model_1 %||% 0)      
     }
     
     # Always show the initial translation in the editor
@@ -4062,7 +4451,7 @@ server <- function(input, output, session) {
       # Success on first pass — notify, update editor, and stop
       shiny::showNotification(llm_compile_success, type = "message", duration = 10)
       
-      if(reuse_context && llm_service == "PMx Co-Modeler") {
+      if(reuse_context && (llm_service == "PMx Co-Modeler" | llm_service == "EXP")) {
         # Relay success to PMx Co-Modeler
         if(show_debugging_msg) message("Relaying success")
         relay_success <- refine_model_code(
@@ -4073,7 +4462,7 @@ server <- function(input, output, session) {
           service                    = llm_service,
           api_key                    = api_key,
           api_chat                   = api_chat,
-          user_id                    = user_id_retry,
+          user_id                    = user_id,
           model_gemini               = model_gemini,
           model_openai               = model_openai,
           model_anthropic            = model_anthropic,
@@ -4089,6 +4478,8 @@ server <- function(input, output, session) {
           temperature                = temperature,
           seed                       = llm_seed,
           attempt                    = attempt,
+          deep_pdfscan               = FALSE, # not relevant
+          force_parse                = FALSE, # not relevant
           system_prompt              = mrgsolve_refine_system_prompt,
           long_user_prompt           = mrgsolve_refine_long_user_prompt,
           short_user_prompt          = mrgsolve_refine_short_user_prompt,
@@ -4106,7 +4497,7 @@ server <- function(input, output, session) {
     error_msg <- get_error_msg(compilation)
     if (show_debugging_msg) print(paste0("Initial compilation error: ", error_msg))
     
-    if (max_retries == 0) {
+    if (max_retries == 0 & model_lang == "mrgsolve") {
       # No retries configured — surface the error and stop
       shiny::showNotification(llm_compile_error, type = "error", duration = 10)
       return()
@@ -4134,7 +4525,7 @@ server <- function(input, output, session) {
         service                    = llm_service,
         api_key                    = api_key,
         api_chat                   = api_chat,
-        user_id                    = user_id_retry,
+        user_id                    = user_id,
         model_gemini               = model_gemini,
         model_openai               = model_openai,
         model_anthropic            = model_anthropic,
@@ -4150,6 +4541,8 @@ server <- function(input, output, session) {
         temperature                = temperature,
         seed                       = llm_seed,
         attempt                    = attempt,
+        deep_pdfscan               = FALSE, # not relevant in retries
+        force_parse                = FALSE, # not relevant in retries
         system_prompt              = mrgsolve_refine_system_prompt,
         long_user_prompt           = mrgsolve_refine_long_user_prompt,
         short_user_prompt          = mrgsolve_refine_short_user_prompt,
@@ -4171,7 +4564,7 @@ server <- function(input, output, session) {
         shiny::showNotification(llm_compile_success, type = "message", duration = 10)
         
         # Relay success to PMx Co-Modeler
-        if(reuse_context && llm_service == "PMx Co-Modeler") {
+        if(reuse_context && (llm_service == "PMx Co-Modeler" | llm_service == "EXP")) {
           if(show_debugging_msg) message("Relaying success")
           relay_success <- refine_model_code(
             model_code                 = current_code$answer,
@@ -4181,7 +4574,7 @@ server <- function(input, output, session) {
             service                    = llm_service,
             api_key                    = api_key,
             api_chat                   = api_chat,
-            user_id                    = user_id_retry,
+            user_id                    = user_id,
             model_gemini               = model_gemini,
             model_openai               = model_openai,
             model_anthropic            = model_anthropic,
@@ -4197,6 +4590,8 @@ server <- function(input, output, session) {
             temperature                = temperature,
             seed                       = llm_seed,
             attempt                    = attempt,
+            deep_pdfscan               = FALSE,
+            force_parse                = FALSE,
             system_prompt              = mrgsolve_refine_system_prompt,
             long_user_prompt           = mrgsolve_refine_long_user_prompt,
             short_user_prompt          = mrgsolve_refine_short_user_prompt,
@@ -4225,20 +4620,12 @@ server <- function(input, output, session) {
   output$upload_pdf_model_2 <- renderUI({
     if (input$model_select2 == 'Upload File (AI Translation)') {
       fluidRow(
-        column(width = 8,
+        column(width = 12,
                fileInput("pdffile_model_2",
-                         label  = llm_pdffile_label,
-                         accept = llm_accept_single_types,
-                         width = "100%",
+                         label    = llm_pdffile_label,
+                         accept   = llm_accept_single_types,
+                         width    = "100%",
                          multiple = TRUE
-               )
-        ),
-        column(width = 4,
-               # Adding a margin to push the checkbox down to align with the file input
-               div(style = "margin-top: 25px;", 
-                   checkboxInput("locally_parse_model_2", 
-                                 label = llm_parse_locally, 
-                                 value = FALSE)
                )
         )
       )
@@ -4247,40 +4634,356 @@ server <- function(input, output, session) {
   
   output$select_llm_model_2 <- renderUI({
     if (input$model_select2 == 'Upload File (AI Translation)') {
-      tagList(
-        div(style = "margin-top: 60px;"), 
-        
-        fluidRow(
-          column(width = 7,
-                 selectInput('llm_model_2', 
-                             label = llm_choices_label,
-                             choices = llm_choices,
-                             selected = first(llm_choices),
-                             width = "100%",
-                             selectize = FALSE)
-          ),
-          column(width = 5,
-                 selectInput('max_retries_model_2', 
-                             label = llm_max_retries_label,
-                             choices = c(0, 1, 2, 3),
-                             selected = 2,
-                             width = "100%",
-                             selectize = FALSE)
-          )
+      fluidRow(
+        column(width = 12,
+               div(style = "margin-top: 40px; display: flex; justify-content: flex-end; gap: 8px;",
+                   actionButton("customize_llm_model_2", label = NULL, icon = icon("gear"), class = "btn-secondary", title = "Customize Translation Settings"),
+                   actionButton("send_to_llm_model_2",   label = NULL, icon = icon("paper-plane"),  class = "btn-primary", title = "Send to LLM for Translation")
+               )
         )
       )
     }
   })
   
-  observeEvent(c(input$pdffile_model_2, input$llm_model_2, input$locally_parse_model_2), {
+  output$model_name_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 == "Gemini") {
+      textInput('model_gemini_model_2',
+                label = "Model (Gemini)",
+                value = llm_settings_model_2$model_gemini
+      )      
+    } else if (input$llm_model_2 == "Claude") {
+      textInput('model_anthropic_model_2',
+                label = "Model (Claude)",
+                value = llm_settings_model_2$model_anthropic
+      )     
+    } else if (input$llm_model_2 == "OpenAI") {
+      textInput('model_openai_model_2',
+                label = "Model (OpenAI)",
+                value = llm_settings_model_2$model_openai
+      )     
+    } else if (input$llm_model_2 == "OpenRouter") {
+      textInput('model_openrouter_model_2',
+                label = "Model (OpenRouter)",
+                value = llm_settings_model_2$model_openrouter
+      )
+    } else if (input$llm_model_2 == "OpenAI-Compatible") {
+      textInput('model_openai_compatible_model_2',
+                label = "Model (OpenAI-Compatible)",
+                value = llm_settings_model_2$model_openai_compatible
+      )
+    } else if (input$llm_model_2 == "Azure OpenAI") {
+      textInput('model_azure_model_2',
+                label = "Model (Azure)",
+                value = llm_settings_model_2$model_azure
+      )      
+    } else if (input$llm_model_2 == "AWS Bedrock") {
+      textInput('model_aws_model_2',
+                label = "Model (AWS Bedrock)",
+                value = llm_settings_model_2$model_aws
+      )
+    } else if (input$llm_model_2 == "DeepSeek") {
+      textInput('model_deepseek_model_2',
+                label = "Model (DeepSeek)",
+                value = llm_settings_model_2$model_deepseek
+      )
+    } else if (input$llm_model_2 == "Test Provider" | input$llm_model_2 == "Apollo") {
+      textInput('model_apollo_model_2',
+                label = "Model (Apollo)",
+                value = llm_settings_model_2$model_apollo
+      )
+    }
+  })
+  
+  output$api_upload_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 == "PMx Co-Modeler" | input$llm_model_2 == "EXP") {
+      # textInput('api_upload_model_2',
+      #           label = "API Upload URL",
+      #           value = llm_settings_model_2$api_upload,
+      #           placeholder = "API Chat URL (BI-only)"
+      # )
+    }
+  })
+  
+  output$api_chat_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 == "OpenAI-Compatible") {
+      textInput('api_chat_model_2',
+                label = "API Chat URL",
+                value = llm_settings_model_2$api_chat,
+                placeholder = "API Chat URL"
+      )
+    }    
+  })
+  
+  output$user_id_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 != "PMx Co-Modeler" & input$llm_model_2 != "EXP") {
+      textInput('user_id_model_2',
+                label = "User ID",
+                value = llm_settings_model_2$user_id
+      )
+    }    
+  })
+  
+  output$temperature_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 != "PMx Co-Modeler" & input$llm_model_2 != "EXP") {
+      sliderInput('temperature_model_2',
+                  label = llm_temp_label,
+                  value = llm_settings_model_2$temperature,
+                  min = 0,
+                  max = 1,
+                  step = 0.1
+      )
+    }    
+  })
+  
+  output$llm_seed_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 != "PMx Co-Modeler" & input$llm_model_2 != "EXP") {
+      numericInput('llm_seed_model_2',
+                   label = llm_seed_label,
+                   value = llm_settings_model_2$llm_seed
+      )
+    }    
+  })
+  
+  output$deep_pdfscan_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 == "PMx Co-Modeler" | input$llm_model_2 == "EXP") {
+      checkboxInput('deep_pdfscan_model_2',
+                    label = llm_deep_pdfscan_label,
+                    value = llm_settings_model_2$deep_pdfscan
+      )
+    }    
+  })
+  
+  output$force_parse_ui_model_2 <- renderUI({
+    shiny::req(input$llm_model_2) # use the live modal input, not the saved reactive
+    
+    if (input$llm_model_2 == "PMx Co-Modeler" | input$llm_model_2 == "EXP") {
+      checkboxInput('force_parse_model_2',
+                    label = llm_force_parse_label,
+                    value = llm_settings_model_2$force_parse
+      )
+    }    
+  })
+  
+  # Show a modal dialog for customizing llm settings
+  observeEvent(input$customize_llm_model_2, {
+    showModal(
+      modalDialog(
+        title = "Customize Translation Settings",
+        easyClose = TRUE, fade = TRUE,
+        fluidRow(
+          column(width = 4,
+                 selectInput('llm_model_2',
+                             label = llm_choices_label,
+                             choices = llm_choices,
+                             selected = llm_settings_model_2$llm_choices,
+                             width = "100%",
+                             selectize = FALSE),
+                 uiOutput("model_name_ui_model_2"),
+                 uiOutput("api_upload_ui_model_2"),
+                 uiOutput("api_chat_ui_model_2"),
+                 uiOutput("user_id_ui_model_2")
+          ),
+          column(width = 4,
+                 selectInput('max_retries_model_2',
+                             label = llm_max_retries_label,
+                             choices = c(0, 1, 2, 3),
+                             selected = llm_settings_model_2$max_retries,
+                             width = "100%",
+                             selectize = FALSE),
+                 uiOutput("temperature_ui_model_2"),
+                 uiOutput("llm_seed_ui_model_2"),
+                 uiOutput("deep_pdfscan_ui_model_2"),
+                 uiOutput("force_parse_ui_model_2")
+          ),
+          column(width = 4,
+                 selectInput('model_lang_model_2',
+                             label = llm_translate_label,
+                             choices = model_lang,
+                             selected = llm_settings_model_2$model_lang,
+                             width = "100%",
+                             selectize = FALSE
+                 ),
+                 checkboxInput('locally_parse_model_2',
+                               label = llm_parse_locally,
+                               value = llm_settings_model_2$locally_parse
+                 ),
+                 checkboxInput('reuse_context_model_2',
+                               label = llm_memory_label,
+                               value = llm_settings_model_2$reuse_context
+                 )
+          ),          
+        ),
+        footer = tagList(
+          actionButton("reset_llm_model_2", "Reset", class = "btn-warning"),
+          actionButton("apply_model_2", "Apply", class = "btn-success"),
+          modalButton("OK")
+        )
+      )
+    )
+  }) 
+  
+  # Reset settings to default values
+  observeEvent(input$reset_llm_model_2, {
+    # Reset the reactive values
+    llm_settings_model_2$llm_choices             <- default_llm_settings$llm_choices
+    llm_settings_model_2$api_upload              <- default_llm_settings$api_upload
+    llm_settings_model_2$api_chat                <- default_llm_settings$api_chat
+    llm_settings_model_2$user_id                 <- default_llm_settings$user_id
+    llm_settings_model_2$reuse_context           <- default_llm_settings$reuse_context
+    llm_settings_model_2$model_gemini            <- default_llm_settings$model_gemini
+    llm_settings_model_2$model_openai            <- default_llm_settings$model_openai
+    llm_settings_model_2$model_anthropic         <- default_llm_settings$model_anthropic
+    llm_settings_model_2$model_openrouter        <- default_llm_settings$model_openrouter
+    llm_settings_model_2$model_openai_compatible <- default_llm_settings$model_openai_compatible
+    llm_settings_model_2$model_deepseek          <- default_llm_settings$model_deepseek
+    llm_settings_model_2$model_apollo            <- default_llm_settings$model_apollo
+    llm_settings_model_2$model_azure             <- default_llm_settings$model_azure
+    llm_settings_model_2$model_aws               <- default_llm_settings$model_aws
+    llm_settings_model_2$temperature             <- default_llm_settings$temperature
+    llm_settings_model_2$llm_seed                <- default_llm_settings$llm_seed
+    llm_settings_model_2$model_lang              <- default_llm_settings$model_lang
+    llm_settings_model_2$locally_parse           <- default_llm_settings$locally_parse
+    llm_settings_model_2$max_retries             <- default_llm_settings$max_retries
+    llm_settings_model_2$deep_pdfscan            <- default_llm_settings$deep_pdfscan
+    llm_settings_model_2$force_parse             <- default_llm_settings$force_parse
+    
+    # Update the modal input fields, BI-only
+    updateSelectInput(session, "llm_model_2",                    selected = default_llm_settings$llm_choices)
+    updateSelectInput(session, "max_retries_model_2",            selected = default_llm_settings$max_retries)
+    updateSelectInput(session, "model_lang_model_2",             selected = default_llm_settings$model_lang)
+    updateCheckboxInput(session, "deep_pdfscan_model_2",            value = default_llm_settings$deep_pdfscan)
+    updateCheckboxInput(session, "force_parse_model_2",             value = default_llm_settings$force_parse)
+    
+    # More general modals
+    updateTextInput(session, "api_upload_model_2",                  value = default_llm_settings$api_upload)
+    updateTextInput(session, "api_chat_model_2",                    value = default_llm_settings$api_chat)
+    updateTextInput(session, "user_id_model_2",                     value = default_llm_settings$user_id)
+    updateCheckboxInput(session, "reuse_context_model_2",           value = default_llm_settings$reuse_context)
+    updateTextInput(session, "model_gemini_model_2",                value = default_llm_settings$model_gemini)
+    updateTextInput(session, "model_openai_model_2",                value = default_llm_settings$model_openai)
+    updateTextInput(session, "model_anthropic_model_2",             value = default_llm_settings$model_anthropic)
+    updateTextInput(session, "model_openrouter_model_2",            value = default_llm_settings$model_openrouter)
+    updateTextInput(session, "model_openai_compatible_model_2",     value = default_llm_settings$model_openai_compatible)
+    updateTextInput(session, "model_deepseek_model_2",              value = default_llm_settings$model_deepseek)
+    updateTextInput(session, "model_apollo_model_2",                value = default_llm_settings$model_apollo)
+    updateTextInput(session, "model_azure_model_2",                 value = default_llm_settings$model_azure)
+    updateTextInput(session, "model_aws_model_2",                   value = default_llm_settings$model_aws)
+    updateSliderInput(session, "temperature_model_2",               value = default_llm_settings$temperature)
+    updateNumericInput(session, "llm_seed_model_2",                 value = default_llm_settings$llm_seed)
+  })
+  
+  # Apply new settings to update the llm_settings reactive
+  observeEvent(input$apply_model_2, {
+    # Always-visible inputs — safe to update unconditionally
+    llm_settings_model_2$llm_choices  <- input$llm_model_2
+    llm_settings_model_2$max_retries  <- input$max_retries_model_2
+    llm_settings_model_2$model_lang   <- input$model_lang_model_2
+    llm_settings_model_2$locally_parse <- input$locally_parse_model_2
+    llm_settings_model_2$reuse_context <- input$reuse_context_model_2
+    
+    # Conditionally visible inputs — only update if the input exists
+    if(!is.null(input$api_upload_model_2))              llm_settings_model_2$api_upload              <- input$api_upload_model_2
+    if(!is.null(input$api_chat_model_2))                llm_settings_model_2$api_chat                <- input$api_chat_model_2
+    if(!is.null(input$user_id_model_2))                 llm_settings_model_2$user_id                 <- input$user_id_model_2
+    if(!is.null(input$model_gemini_model_2))            llm_settings_model_2$model_gemini            <- input$model_gemini_model_2
+    if(!is.null(input$model_openai_model_2))            llm_settings_model_2$model_openai            <- input$model_openai_model_2
+    if(!is.null(input$model_anthropic_model_2))         llm_settings_model_2$model_anthropic         <- input$model_anthropic_model_2
+    if(!is.null(input$model_openrouter_model_2))        llm_settings_model_2$model_openrouter        <- input$model_openrouter_model_2
+    if(!is.null(input$model_openai_compatible_model_2)) llm_settings_model_2$model_openai_compatible <- input$model_openai_compatible_model_2
+    if(!is.null(input$model_deepseek_model_2))          llm_settings_model_2$model_deepseek          <- input$model_deepseek_model_2
+    if(!is.null(input$model_apollo_model_2))            llm_settings_model_2$model_apollo            <- input$model_apollo_model_2
+    if(!is.null(input$model_azure_model_2))             llm_settings_model_2$model_azure             <- input$model_azure_model_2
+    if(!is.null(input$model_aws_model_2))               llm_settings_model_2$model_aws               <- input$model_aws_model_2
+    if(!is.null(input$temperature_model_2))             llm_settings_model_2$temperature             <- input$temperature_model_2
+    if(!is.null(input$llm_seed_model_2))                llm_settings_model_2$llm_seed                <- input$llm_seed_model_2
+    if(!is.null(input$deep_pdfscan_model_2))            llm_settings_model_2$deep_pdfscan            <- input$deep_pdfscan_model_2
+    if(!is.null(input$force_parse_model_2))             llm_settings_model_2$force_parse             <- input$force_parse_model_2
+    
+    # Update the modal input fields, BI-only
+    updateSelectInput(session, "llm_model_2",                    selected = llm_settings_model_2$llm_choices)
+    updateSelectInput(session, "max_retries_model_2",            selected = llm_settings_model_2$max_retries)
+    updateSelectInput(session, "model_lang_model_2",             selected = llm_settings_model_2$model_lang)
+    if(llm_settings_model_2$llm_choices == "PMx Co-Modeler" | llm_settings_model_2$llm_choices == "EXP") {
+      updateCheckboxInput(session, "deep_pdfscan_model_2",          value = llm_settings_model_2$deep_pdfscan)
+      updateCheckboxInput(session, "force_parse_model_2",           value = llm_settings_model_2$force_parse)
+    }
+    # More general modals
+    #updateTextInput(session, "api_upload_model_2",               selected = llm_settings_model_2$api_upload)
+    
+    if(llm_settings_model_2$llm_choices == "OpenAI-Compatible") {
+      updateTextInput(session, "api_chat_model_2",                    value = llm_settings_model_2$api_chat)
+    }
+    updateTextInput(session, "user_id_model_2",                     value = llm_settings_model_2$user_id)
+    updateCheckboxInput(session, "reuse_context_model_2",           value = llm_settings_model_2$reuse_context)
+    updateTextInput(session, "model_gemini_model_2",                value = llm_settings_model_2$model_gemini)
+    updateTextInput(session, "model_openai_model_2",                value = llm_settings_model_2$model_openai)
+    updateTextInput(session, "model_anthropic_model_2",             value = llm_settings_model_2$model_anthropic)
+    updateTextInput(session, "model_openrouter_model_2",            value = llm_settings_model_2$model_openrouter)
+    updateTextInput(session, "model_openai_compatible_model_2",     value = llm_settings_model_2$model_openai_compatible)
+    updateTextInput(session, "model_deepseek_model_2",              value = llm_settings_model_2$model_deepseek)
+    updateTextInput(session, "model_apollo_model_2",                value = llm_settings_model_2$model_apollo)
+    updateTextInput(session, "model_azure_model_2",                 value = llm_settings_model_2$model_azure)
+    updateTextInput(session, "model_aws_model_2",                   value = llm_settings_model_2$model_aws)
+    updateSliderInput(session, "temperature_model_2",               value = llm_settings_model_2$temperature)
+    updateNumericInput(session, "llm_seed_model_2",                 value = llm_settings_model_2$llm_seed)
+  })  
+  
+  observeEvent(input$send_to_llm_model_2, {
+    shiny::req(input$pdffile_model_2)
     if(!llm_packages_available) {
-      showNotification("ERROR: Please install the 'ellmer' R package to use this functionality.", type = "error", duration = 10)
+      showNotification("ERROR: Please install the 'ellmer' and 'pdftools' packages to use this functionality.", type = "error", duration = 10)
       return(NULL)
     }
     current_code     <- NULL
-    llm_service      <- input$llm_model_2
+    llm_service      <- first(llm_settings_model_2$llm_choices)
     api_key          <- get_api_key(llm_service)
     key_name_env_var <- get_api_key_name(llm_service)
+    
+    ## Creating short-hand based on LLM settings reactives
+    api_upload                 <- llm_settings_model_2$api_upload
+    api_chat                   <- llm_settings_model_2$api_chat
+    user_id                    <- llm_settings_model_2$user_id
+    reuse_context              <- llm_settings_model_2$reuse_context
+    model_gemini               <- llm_settings_model_2$model_gemini
+    model_openai               <- llm_settings_model_2$model_openai
+    model_anthropic            <- llm_settings_model_2$model_anthropic
+    model_openrouter           <- llm_settings_model_2$model_openrouter
+    model_openai_compatible    <- llm_settings_model_2$model_openai_compatible
+    model_deepseek             <- llm_settings_model_2$model_deepseek
+    model_apollo               <- llm_settings_model_2$model_apollo
+    model_azure                <- llm_settings_model_2$model_azure
+    model_aws                  <- llm_settings_model_2$model_aws
+    #display_info               <- TRUE
+    temperature                <- llm_settings_model_2$temperature
+    llm_seed                   <- llm_settings_model_2$llm_seed
+    model_lang                 <- llm_settings_model_2$model_lang
+    locally_parse              <- llm_settings_model_2$locally_parse
+    deep_pdfscan               <- llm_settings_model_2$deep_pdfscan
+    force_parse                <- llm_settings_model_2$force_parse
+    max_retries                <- as.numeric(llm_settings_model_2$max_retries %||% 0)
+    #internal_version           <- internal_version
+    
+    
+    if(show_debugging_msg) print(paste0("api_upload: ", api_upload))
+    if(show_debugging_msg) print(paste0("api_chat: ", api_chat))
+    if(show_debugging_msg) print(paste0("deep_pdfscan: ", deep_pdfscan))
+    if(show_debugging_msg) print(paste0("force_parse: ", force_parse))
+    if(show_debugging_msg) print(paste0("user_id: ", user_id))
+    if(show_debugging_msg) print(paste0("max_retries: ", max_retries))
     
     # Validate API key first
     if (is.null(api_key) || api_key == "") {
@@ -4329,6 +5032,8 @@ server <- function(input, output, session) {
       if (is.null(compilation$result)) compilation$error else compilation$result$out$stderr
     }
     
+    if(show_debugging_msg) message("Beginning translation")
+    
     # 1. Initial Translation
     current_code <- translate_model_code(
       ready_path                 = ready_path,
@@ -4350,8 +5055,10 @@ server <- function(input, output, session) {
       display_info               = TRUE,
       temperature                = temperature,
       seed                       = llm_seed,
-      locally_parse_file         = input$locally_parse_model_2,
+      locally_parse_file         = locally_parse,
       model_lang                 = model_lang,
+      deep_pdfscan               = deep_pdfscan,
+      force_parse                = force_parse,
       mrgsolve_system_prompt     = mrgsolve_translation_system_prompt,
       mrgsolve_long_user_prompt  = mrgsolve_translation_long_user_prompt,
       mrgsolve_short_user_prompt = mrgsolve_translation_short_user_prompt,
@@ -4372,8 +5079,6 @@ server <- function(input, output, session) {
     if(model_lang != "mrgsolve") {
       max_retries     <- 0
       shiny::showNotification(paste0("No Retries when translating to ", model_lang, "."), type = "message", duration = 10)
-    } else {
-      max_retries     <- as.numeric(input$max_retries_model_2 %||% 0)      
     }
     
     # Always show the initial translation in the editor
@@ -4386,8 +5091,8 @@ server <- function(input, output, session) {
       # Success on first pass — notify, update editor, and stop
       shiny::showNotification(llm_compile_success, type = "message", duration = 10)
       
-      # Relay success to PMx Co-Modeler
-      if(reuse_context && llm_service == "PMx Co-Modeler") {
+      if(reuse_context && (llm_service == "PMx Co-Modeler" | llm_service == "EXP")) {
+        # Relay success to PMx Co-Modeler
         if(show_debugging_msg) message("Relaying success")
         relay_success <- refine_model_code(
           model_code                 = current_code$answer,
@@ -4397,7 +5102,7 @@ server <- function(input, output, session) {
           service                    = llm_service,
           api_key                    = api_key,
           api_chat                   = api_chat,
-          user_id                    = user_id_retry,
+          user_id                    = user_id,
           model_gemini               = model_gemini,
           model_openai               = model_openai,
           model_anthropic            = model_anthropic,
@@ -4413,11 +5118,13 @@ server <- function(input, output, session) {
           temperature                = temperature,
           seed                       = llm_seed,
           attempt                    = attempt,
+          deep_pdfscan               = FALSE, # not relevant
+          force_parse                = FALSE, # not relevant
           system_prompt              = mrgsolve_refine_system_prompt,
           long_user_prompt           = mrgsolve_refine_long_user_prompt,
           short_user_prompt          = mrgsolve_refine_short_user_prompt,
           internal_version           = internal_version,
-          feedback_success           = TRUE, # Model cache purposes
+          feedback_success           = TRUE,
           debug                      = show_debugging_msg
         )
       }
@@ -4430,7 +5137,7 @@ server <- function(input, output, session) {
     error_msg <- get_error_msg(compilation)
     if (show_debugging_msg) print(paste0("Initial compilation error: ", error_msg))
     
-    if (max_retries == 0) {
+    if (max_retries == 0 & model_lang == "mrgsolve") {
       # No retries configured — surface the error and stop
       shiny::showNotification(llm_compile_error, type = "error", duration = 10)
       return()
@@ -4458,7 +5165,7 @@ server <- function(input, output, session) {
         service                    = llm_service,
         api_key                    = api_key,
         api_chat                   = api_chat,
-        user_id                    = user_id_retry,
+        user_id                    = user_id,
         model_gemini               = model_gemini,
         model_openai               = model_openai,
         model_anthropic            = model_anthropic,
@@ -4474,6 +5181,8 @@ server <- function(input, output, session) {
         temperature                = temperature,
         seed                       = llm_seed,
         attempt                    = attempt,
+        deep_pdfscan               = FALSE, # not relevant in retries
+        force_parse                = FALSE, # not relevant in retries
         system_prompt              = mrgsolve_refine_system_prompt,
         long_user_prompt           = mrgsolve_refine_long_user_prompt,
         short_user_prompt          = mrgsolve_refine_short_user_prompt,
@@ -4495,7 +5204,7 @@ server <- function(input, output, session) {
         shiny::showNotification(llm_compile_success, type = "message", duration = 10)
         
         # Relay success to PMx Co-Modeler
-        if(reuse_context && llm_service == "PMx Co-Modeler") {
+        if(reuse_context && (llm_service == "PMx Co-Modeler" | llm_service == "EXP")) {
           if(show_debugging_msg) message("Relaying success")
           relay_success <- refine_model_code(
             model_code                 = current_code$answer,
@@ -4505,7 +5214,7 @@ server <- function(input, output, session) {
             service                    = llm_service,
             api_key                    = api_key,
             api_chat                   = api_chat,
-            user_id                    = user_id_retry,
+            user_id                    = user_id,
             model_gemini               = model_gemini,
             model_openai               = model_openai,
             model_anthropic            = model_anthropic,
@@ -4521,11 +5230,13 @@ server <- function(input, output, session) {
             temperature                = temperature,
             seed                       = llm_seed,
             attempt                    = attempt,
+            deep_pdfscan               = FALSE,
+            force_parse                = FALSE,
             system_prompt              = mrgsolve_refine_system_prompt,
             long_user_prompt           = mrgsolve_refine_long_user_prompt,
             short_user_prompt          = mrgsolve_refine_short_user_prompt,
             internal_version           = internal_version,
-            feedback_success           = TRUE,
+            feedback_success           = TRUE, # Model cache purposes
             debug                      = show_debugging_msg
           )
         }
@@ -5445,29 +6156,19 @@ server <- function(input, output, session) {
   }, label = 'update_y_axis_name_2')
   
   observeEvent(nmdata_cmt_filtered(), {
-    if (isolate(pending_session_restore())) {
-      updateSelectizeInput(session, "nonmem_y_axis", choices = names(nmdata_cmt_filtered()) %>% sort())
-    } else {
-      updateSelectizeInput(session, "nonmem_y_axis", choices = names(nmdata_cmt_filtered()) %>% sort(), selected = 'DV')
-    }
-  }, label = 'update_nonmem_y_axis')
-  
-  observeEvent(nmdata_cmt_filtered(), {
-    if (isolate(pending_session_restore())) {
-      updateSelectizeInput(session, "color_data_by",
-                           choices = names(nmdata_cmt_filtered()) %>% sort())
-    } else {
-      updateSelectizeInput(session, "color_data_by",
-                           choices  = names(nmdata_cmt_filtered()) %>% sort(),
-                           selected = NA)
-    }
-  }, label = 'update_color_data_by')
+    if (isolate(pending_session_restore())) return()
+    
+    choices <- names(nmdata_cmt_filtered()) %>% sort()
+    updateSelectizeInput(session, "nonmem_y_axis", choices = choices, selected = 'DV')
+    updateSelectizeInput(session, "color_data_by", choices = choices, selected = NA)
+  }, label = 'update_nonmem_y_axis_color_data_by')
   
   observeEvent(c(nmdata_cmt_filtered(), input$color_data_by), {
-    updateSelectizeInput(session,
-                         "stat_sum_data_by",
-                         choices = names(nmdata_cmt_filtered()) %>% sort(),
-                         selected = input$color_data_by)
+    if (isolate(pending_session_restore())) {
+      updateSelectizeInput(session, "stat_sum_data_by", choices = names(nmdata_cmt_filtered()) %>% sort(), selected = isolate(input$stat_sum_data_by))
+    } else {
+      updateSelectizeInput(session, "stat_sum_data_by", choices = names(nmdata_cmt_filtered()) %>% sort(), selected = input$color_data_by)
+    }
   }, label = 'update_stat_sum_data_by')
   
   sim_1_dataset_arg <- reactive({

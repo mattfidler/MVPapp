@@ -5749,6 +5749,8 @@ safely_incProgress <- function(amount, detail = NULL) {
 #' @param seed seed number for LLMs
 #' @param locally_parse_file if TRUE, extracts text locally and includes in prompt instead of uploading file
 #' @param model_lang Either "mrgsolve" or "nonmem" (changes the prompt)
+#' @param deep_pdfscan Use Vision to extract image data (BI only)
+#' @param force_parse Force parsing (BI only)
 #' @param mrgsolve_system_prompt String for mrgsolve system prompt
 #' @param mrgsolve_long_user_prompt String for mrgsolve long user prompt
 #' @param mrgsolve_short_user_prompt String for mrgsolve short user prompt
@@ -5795,6 +5797,8 @@ translate_model_code <- function(ready_path,
                                  seed = 42,
                                  locally_parse_file = FALSE,
                                  model_lang = "mrgsolve",
+                                 deep_pdfscan = FALSE,
+                                 force_parse = FALSE,
                                  mrgsolve_system_prompt,
                                  mrgsolve_long_user_prompt,
                                  mrgsolve_short_user_prompt,
@@ -5841,6 +5845,10 @@ translate_model_code <- function(ready_path,
                        "AWS Bedrock"       = model_aws)
   
   models_no_temperature <- c("gpt-5-mini", "gpt-5-nano", "gpt-5", "o1", "o3-mini", "o4")
+  
+  if(debug) {
+    print(paste0("translate_model_code: 0) model_name is: ", model_name))
+  }
   
   if(model_name %in% models_no_temperature) {
     safely_showNotification(paste0(model_name, " does not support temperature setting."), type = "warning")
@@ -5942,6 +5950,8 @@ translate_model_code <- function(ready_path,
           file_path          = file_path,
           detected_type      = detected_type,
           locally_parse_file = locally_parse_file,
+          deep_pdfscan       = deep_pdfscan,
+          force_parse        = force_parse,
           model_name         = model_name,
           debug              = debug
         )
@@ -6072,6 +6082,8 @@ translate_model_code <- function(ready_path,
 #' @param temperature Goes from 0 to 1, where 0 is deterministic, if not reusing context
 #' @param seed seed number for LLMs, if not reusing context
 #' @param attempt current attempt number
+#' @param deep_pdfscan Uses Vision to extract image data (BI only)
+#' @param force_parse Force reparsing (BI only)
 #' @param system_prompt Character. System prompt
 #' @param long_user_prompt Character. Long user prompt
 #' @param short_user_prompt Character. Short user prompt
@@ -6108,6 +6120,8 @@ refine_model_code <- function(model_code,
                               temperature = 0,
                               seed = 42,
                               attempt = 1,
+                              deep_pdfscan = FALSE,
+                              force_parse = FALSE,
                               system_prompt,
                               long_user_prompt,
                               short_user_prompt,
@@ -6208,6 +6222,8 @@ refine_model_code <- function(model_code,
           user_id            = user_id,
           locally_parse_file = TRUE,
           model_name         = model_name,
+          deep_pdfscan          = FALSE,
+          force_parse      = FALSE,
           debug              = debug
         )
       } else {
@@ -6421,7 +6437,7 @@ extract_file_content <- function(file_path,
 #-------------------------------------------------------------------------------
 #' @name run_dify_chat
 #'
-#' @title Send a chat request to a Dify Workflow via httr2
+#' @title Send a chat request to a Dify Workflow via httr2 (BI-only)
 #'
 #' @description
 #' Handles the full Dify API interaction: optionally uploads a file first,
@@ -6442,6 +6458,8 @@ extract_file_content <- function(file_path,
 #' @param locally_parse_file If \code{TRUE}, skips file upload and sends text
 #'   content directly in the prompt
 #' @param conversation_id Default NULL, required for context reuse
+#' @param deep_pdfscan Default FALSE, uses Vision to extract images
+#' @param force_parse Default FALSE, forces reparsing
 #' @param model_name Model name string used as a fallback label in usage_info
 #'   if the API does not return a model identifier
 #' @param debug If \code{TRUE}, prints progress messages to the console
@@ -6465,17 +6483,24 @@ run_dify_chat <- function(instruction_prompt,
                           detected_type      = NULL,
                           locally_parse_file = TRUE,
                           conversation_id    = NULL,   # NEW: for context reuse
+                          deep_pdfscan       = FALSE,
+                          force_parse        = FALSE,
                           model_name,
                           debug = TRUE) {
   
   chat_body <- if(locally_parse_file) {
     
+    if(debug) print("run_dify_chat: locally_parse_file == TRUE")
+    
     if(!is.null(conversation_id)) {
+      
+      if(debug) print("run_dify_chat: conversation_id is not NULL")
+      
       list(
         query = instruction_prompt,
         response_mode = "blocking",
         user = user_id,
-        conversation_id = conversation_id %||% "", # USE CONTEXT HERE
+        conversation_id = conversation_id, # USE CONTEXT HERE
         inputs = setNames(list(), character(0)) # Force an empty dictionary {} instead of an empty array []
       )
     } else {
@@ -6497,8 +6522,12 @@ run_dify_chat <- function(instruction_prompt,
       httr2::req_perform() %>%
       httr2::resp_body_json()
     
+    if(debug) print("run_dify_chat: upload_data formed")
+    
     list(
       inputs = list(
+        deep_pdfscan = tolower(as.character(deep_pdfscan)),
+        force_parse = tolower(as.character(force_parse)),
         fileInput = list(list(
           transfer_method = "local_file",
           upload_file_id  = upload_data$id,
@@ -7460,6 +7489,7 @@ get_session_state <- function(input, rv, uploaded_data) {
 #'   a file upload.
 #' @param show_note Logical. Whether to display a version compatibility
 #'   notification on restore. Default \code{TRUE}.
+#' @param selectize_choices Workaround for restoring nonmem_y_axis and color_data_by   
 #'
 #' @return \code{NULL} invisibly. Called for its side effects.
 #'
@@ -7479,17 +7509,8 @@ get_session_state <- function(input, rv, uploaded_data) {
 #' @seealso \code{\link{get_session_state}} for the complementary save function.
 #'
 #' @export
-restore_session_state <- function(state, input, session, rv, uploaded_data_override, show_note) {
-  
-  # --- Version compatibility check ---
-  # if (!is.null(state$version) && state$version != as.character(packageVersion("MVPapp"))) {
-  #   showNotification(
-  #     paste0("Session was saved with v", state$version, 
-  #            " (current: v", packageVersion("MVPapp"), "). ",
-  #            "Some settings may not restore correctly."),
-  #     type = "warning", duration = 8
-  #   )
-  # }
+restore_session_state <- function(state, input, session, rv, uploaded_data_override, show_note,
+                                  selectize_choices = NULL) {
   
   # --- Version compatibility check ---
   if(show_note) {
@@ -7693,9 +7714,16 @@ restore_session_state <- function(state, input, session, rv, uploaded_data_overr
   updateCheckboxInput(session, "add_time_zero",            value    = state$sim$add_time_zero)
   
   # --- Simulation options (Dataset) ---
-  updateSelectizeInput(session, "nonmem_y_axis",           selected = state$sim$nonmem_y_axis)
   updateSelectizeInput(session, "filter_cmt",              selected = state$sim$filter_cmt)
-  updateSelectizeInput(session, "color_data_by ",          selected = state$sim$color_data_by)
+  
+  if (!is.null(selectize_choices)) {
+    updateSelectizeInput(session, "nonmem_y_axis", choices = selectize_choices, selected = state$sim$nonmem_y_axis)
+    updateSelectizeInput(session, "color_data_by", choices = selectize_choices, selected = state$sim$color_data_by)
+  } else {
+    updateSelectizeInput(session, "nonmem_y_axis", selected = state$sim$nonmem_y_axis)
+    updateSelectizeInput(session, "color_data_by", selected = state$sim$color_data_by)
+  }
+  
   updateCheckboxInput(session, "stat_sum_data_by",         value    = state$sim$stat_sum_data_by)
   updateCheckboxInput(session, "combine_nmdata",           value    = state$sim$combine_nmdata)
   updateCheckboxInput(session, "stat_sum_data_option",     value    = state$sim$stat_sum_data_option)

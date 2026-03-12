@@ -16,7 +16,6 @@ run_mvp(
   api_upload = NA_character_,
   api_chat = NA_character_,
   user_id = "mrgsolve_translator",
-  user_id_retry = "mrgsolve_translator",
   reuse_context = FALSE,
   model_gemini = "gemini-3-flash-preview",
   model_openai = "gpt-5.4",
@@ -50,13 +49,11 @@ run_mvp(
 
 \item{llm_choices}{Character. Supported providers are "Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "Deepseek", "Azure OpenAI", "AWS Bedrock"}
 
-\item{api_upload}{Character. Default NA_character_. API upload URL when using Dify-based workflows}
+\item{api_upload}{Character. Default NA_character_. API upload URL when using Dify-based workflows (BI-only)}
 
-\item{api_chat}{Character. Default NA_character_. API chat URL required when using OpenAI-compatible providers}
+\item{api_chat}{Character. Default NA_character_. API chat URL required when using OpenAI-Compatible providers}
 
-\item{user_id}{Character. Default mrgsolve_translator. User ID for LLMs (BI-only).}
-
-\item{user_id_retry}{Character. Default mrgsolve_translator. User ID for submitting retries to LLMs (BI-only).}
+\item{user_id}{Character. Default MVP_user. User ID for LLMs}
 
 \item{reuse_context}{Logical. Default FALSE. Set to TRUE to re-use same conversation during retries.}
 

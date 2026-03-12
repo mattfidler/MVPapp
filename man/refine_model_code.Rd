@@ -29,6 +29,8 @@ refine_model_code(
   temperature = 0,
   seed = 42,
   attempt = 1,
+  deep_pdfscan = FALSE,
+  force_parse = FALSE,
   system_prompt,
   long_user_prompt,
   short_user_prompt,
@@ -86,6 +88,10 @@ refine_model_code(
 \item{seed}{seed number for LLMs, if not reusing context}
 
 \item{attempt}{current attempt number}
+
+\item{deep_pdfscan}{Uses Vision to extract image data (BI only)}
+
+\item{force_parse}{Force reparsing (BI only)}
 
 \item{system_prompt}{Character. System prompt}
 

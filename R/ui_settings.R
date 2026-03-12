@@ -205,6 +205,24 @@ llm_pdffile_label     <- shiny::HTML(paste0("Upload File(s) ",
 llm_parse_locally    <- shiny::HTML(paste0("Parse Locally",
                                            "<i class='fa fa-question-circle' title='Parse PDF / text file (.txt/.mod/.ctl) locally and bypass file upload, which may be required if the LLM provider does not natively support file attachments (it can also reduce token usage). Note that this method extracts only text, which may be less accurate for files with lots of images.' style='margin-left: 3px;'></i>"))
 #' @export
+llm_temp_label       <- shiny::HTML(paste0("Temperature",
+                                           "<i class='fa fa-question-circle' title='0 = more deterministic, 1 = more creative (Not all providers support this setting).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_seed_label       <- shiny::HTML(paste0("Seed",
+                                            "<i class='fa fa-question-circle' title='Seed for reproducibility (Not all providers support this setting).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_memory_label     <- shiny::HTML(paste0("Memory",
+                                           "<i class='fa fa-question-circle' title='Keep same conversation during retries to improve results at the cost of increased token usage.' style='margin-left: 3px;'></i>"))
+#' @export
+llm_translate_label  <- shiny::HTML(paste0("Translate to:",
+                                           "<i class='fa fa-question-circle' title='NONMEM and RxODE2 translation is provided for testing purposes only (no retries will be done as MVP only supports mrgsolve).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_deep_pdfscan_label  <- shiny::HTML(paste0("Vision",
+                                           "<i class='fa fa-question-circle' title='Convert each page of a PDF into image data for more accurate parsing (slower).' style='margin-left: 3px;'></i>"))
+#' @export
+llm_force_parse_label  <- shiny::HTML(paste0("Force Parse",
+                                           "<i class='fa fa-question-circle' title='Enforce parsing even if previous model was cached.' style='margin-left: 3px;'></i>"))
+#' @export
 llm_accept_single_types <- c(".pdf", ".txt", ".docx", ".html", ".md", ".markdown", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".eml", ".msg", ".json", ".yaml", ".yml", ".mod", ".ctl")
 #' @export
 llm_accept_multi_types  <- c(".pdf", ".txt", ".mod", ".ctl")

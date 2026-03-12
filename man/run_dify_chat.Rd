@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{run_dify_chat}
 \alias{run_dify_chat}
-\title{Send a chat request to a Dify Workflow via httr2}
+\title{Send a chat request to a Dify Workflow via httr2 (BI-only)}
 \usage{
 run_dify_chat(
   instruction_prompt,
@@ -14,6 +14,8 @@ run_dify_chat(
   detected_type = NULL,
   locally_parse_file = TRUE,
   conversation_id = NULL,
+  deep_pdfscan = FALSE,
+  force_parse = FALSE,
   model_name,
   debug = TRUE
 )
@@ -41,6 +43,10 @@ Only used when \code{locally_parse_file = FALSE}}
 content directly in the prompt}
 
 \item{conversation_id}{Default NULL, required for context reuse}
+
+\item{deep_pdfscan}{Default FALSE, uses Vision to extract images}
+
+\item{force_parse}{Default FALSE, forces reparsing}
 
 \item{model_name}{Model name string used as a fallback label in usage_info
 if the API does not return a model identifier}

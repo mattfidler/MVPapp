@@ -10,7 +10,8 @@ restore_session_state(
   session,
   rv,
   uploaded_data_override,
-  show_note
+  show_note,
+  selectize_choices = NULL
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ a file upload.}
 
 \item{show_note}{Logical. Whether to display a version compatibility
 notification on restore. Default \code{TRUE}.}
+
+\item{selectize_choices}{Workaround for restoring nonmem_y_axis and color_data_by}
 }
 \value{
 \code{NULL} invisibly. Called for its side effects.
