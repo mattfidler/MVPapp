@@ -25,7 +25,7 @@ which case a Shiny notification is shown). The file lives in
 Merges a list of locally stored files (from a Shiny \code{fileInput} with
 \code{multiple = TRUE}) into a single temporary file, ready for downstream
 processing such as sending to an LLM. Supports PDF (merged page-by-page)
-and plain text types including \code{.txt}, \code{.mod}, and \code{.ctl}
+and plain text types including \code{.txt}, \code{.mod}, \code{.ctl}, and \code{.cpp}
 (concatenated). On error, a Shiny notification is shown to the user and
 \code{NULL} is returned rather than stopping the session.
 }

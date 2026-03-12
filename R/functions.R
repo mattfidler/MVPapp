@@ -5822,8 +5822,8 @@ translate_model_code <- function(ready_path,
     new_path <- paste0(file_path, ".txt")
     file.copy(file_path, new_path)
     file_path <- new_path
-    #locally_parse_file <- TRUE
-    #safely_showNotification(paste0("Text file detected, will be parsed locally to bypass file upload."))
+    locally_parse_file <- TRUE
+    safely_showNotification(paste0("Text file detected, will be parsed locally to bypass file upload."))
   } else {
     detected_type <- mime::guess_type(file_name)
   }
@@ -6727,6 +6727,7 @@ run_ellmer_chat <- function(service,
 #' @param files A data frame produced by a Shiny \code{fileInput} widget,
 #'   containing at minimum the columns \code{name} (original filename) and
 #'   \code{datapath} (server-side temporary path).
+#' @param llm_service LLM provider name. More extensions are accepted by Dify-workflows.
 #' @param single_file_types Character vector of permitted file extensions when
 #'   exactly one file is uploaded, e.g. \code{c(".pdf", ".docx", ".csv")}.
 #'   Extensions should include the leading dot.
@@ -6787,12 +6788,20 @@ run_ellmer_chat <- function(service,
 #'
 #' @export
 prepare_uploaded_files <- function(files,
+                                   llm_service,
                                    single_file_types,
                                    multi_file_types) {
   
+  # Determine accepted file types based on llm choice
+  accept_types <- if (llm_service %in% c("PMx Co-Modeler", "EXP")) {
+    single_file_types  # Dify supports text too
+  } else {
+    multi_file_types  # default for other providers (PDF or text-equivalent)
+  }
+  
   # ── Helper: normalise interchangeable plain-text extensions ──────────────────
   normalize_ext <- function(ext) {
-    ifelse(ext %in% c(".ctl", ".mod"), ".txt", ext)
+    ifelse(ext %in% c(".ctl", ".mod", ".cpp"), ".txt", ext)
   }
   
   exts            <- tolower(paste0(".", tools::file_ext(files$name)))
@@ -6805,7 +6814,7 @@ prepare_uploaded_files <- function(files,
       safely_showNotification(
         paste0("Unsupported file type: '", exts, "'. ",
                "Supported types are: ",
-               paste(single_file_types, collapse = ", ")),
+               paste(accept_types, collapse = ", ")),
         type     = "error",
         duration = NULL
       )
@@ -6855,7 +6864,7 @@ prepare_uploaded_files <- function(files,
 #' Merges a list of locally stored files (from a Shiny \code{fileInput} with
 #' \code{multiple = TRUE}) into a single temporary file, ready for downstream
 #' processing such as sending to an LLM. Supports PDF (merged page-by-page)
-#' and plain text types including \code{.txt}, \code{.mod}, and \code{.ctl}
+#' and plain text types including \code{.txt}, \code{.mod}, \code{.ctl}, and \code{.cpp}
 #' (concatenated). On error, a Shiny notification is shown to the user and
 #' \code{NULL} is returned rather than stopping the session.
 #'
@@ -6937,7 +6946,7 @@ combine_uploaded_files <- function(file_paths, file_names) {
   
   # Normalize interchangeable plain-text extensions before uniqueness check
   normalize_ext <- function(ext) {
-    ifelse(ext %in% c(".ctl", ".mod"), ".txt", ext)
+    ifelse(ext %in% c(".ctl", ".mod", ".cpp"), ".txt", ext)
   }
   normalized_exts <- normalize_ext(exts)
   
@@ -6960,8 +6969,8 @@ combine_uploaded_files <- function(file_paths, file_names) {
     return(output_path)
   }
   
-  # ── Plain text: .txt, .mod, .ctl ─────────────────────────────────────────────
-  if (ext %in% c(".txt", ".mod", ".ctl")) {
+  # ── Plain text: .txt, .mod, .ctl, .cpp ──────────────────────────────────────
+  if (ext %in% c(".txt", ".mod", ".ctl", ".cpp")) {
     output_path <- tempfile(fileext = ".txt")
     combined_text <- sapply(file_paths, readLines, warn = FALSE) %>%
       unlist() %>%
@@ -6973,7 +6982,7 @@ combine_uploaded_files <- function(file_paths, file_names) {
   # ── Fallback: unsupported type ───────────────────────────────────────────────
   shiny::showNotification(
     paste0("Unsupported file type for multi-file combining: '", ext, "'. ",
-           "Supported types are: .pdf, .txt, .mod, .ctl"),
+           "Supported types are: .pdf, .txt, .mod, .ctl, .cpp"),
     type     = "error",
     duration = NULL
   )

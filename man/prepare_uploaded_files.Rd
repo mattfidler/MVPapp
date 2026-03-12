@@ -4,12 +4,14 @@
 \alias{prepare_uploaded_files}
 \title{Validate and Prepare Uploaded Files for LLM Processing}
 \usage{
-prepare_uploaded_files(files, single_file_types, multi_file_types)
+prepare_uploaded_files(files, llm_service, single_file_types, multi_file_types)
 }
 \arguments{
 \item{files}{A data frame produced by a Shiny \code{fileInput} widget,
 containing at minimum the columns \code{name} (original filename) and
 \code{datapath} (server-side temporary path).}
+
+\item{llm_service}{LLM provider name. More extensions are accepted by Dify-workflows.}
 
 \item{single_file_types}{Character vector of permitted file extensions when
 exactly one file is uploaded, e.g. \code{c(".pdf", ".docx", ".csv")}.

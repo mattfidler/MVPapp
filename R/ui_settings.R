@@ -223,9 +223,9 @@ llm_deep_pdfscan_label  <- shiny::HTML(paste0("Vision",
 llm_force_parse_label  <- shiny::HTML(paste0("Force Parse",
                                            "<i class='fa fa-question-circle' title='Enforce parsing even if previous model was cached.' style='margin-left: 3px;'></i>"))
 #' @export
-llm_accept_single_types <- c(".pdf", ".txt", ".docx", ".html", ".md", ".markdown", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".eml", ".msg", ".json", ".yaml", ".yml", ".mod", ".ctl")
+llm_accept_single_types <- c(".pdf", ".txt", ".docx", ".html", ".md", ".markdown", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".eml", ".msg", ".json", ".yaml", ".yml", ".mod", ".ctl", ".cpp")
 #' @export
-llm_accept_multi_types  <- c(".pdf", ".txt", ".mod", ".ctl")
+llm_accept_multi_types  <- c(".pdf", ".txt", ".mod", ".ctl", ".cpp")
 #' @export
 llm_choices_label     <- shiny::HTML(paste0("Select LLM",
                                             "<i class='fa fa-question-circle' title='MVP supports several main LLM providers. This requires the .Renviron file be configured correctly (note: the api_chat URL argument must also be provided if using a OpenAI-compatible API).' style='margin-left: 3px;'></i>"))

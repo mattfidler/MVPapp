@@ -3979,11 +3979,19 @@ server <- function(input, output, session) {
   ## Handling upload of file option for parsing by external LLM
   output$upload_pdf_model_1 <- renderUI({
     if (input$model_select == 'Upload File (AI Translation)') {
+      
+      # Determine accepted file types based on llm choice
+      accept_types <- if (llm_settings_model_1$llm_choices %in% c("PMx Co-Modeler", "EXP")) {
+        llm_accept_single_types  # Dify supports text too
+      } else {
+        llm_accept_multi_types  # default for other providers (PDF or text-equivalent)
+      }
+      
       fluidRow(
         column(width = 12,
                fileInput("pdffile_model_1",
                          label    = llm_pdffile_label,
-                         accept   = llm_accept_single_types,
+                         accept   = accept_types,
                          width    = "100%",
                          multiple = TRUE
                )
@@ -4309,7 +4317,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     current_code     <- NULL
-    llm_service      <- first(llm_settings_model_1$llm_choices)
+    llm_service      <- llm_settings_model_1$llm_choices
     api_key          <- get_api_key(llm_service)
     key_name_env_var <- get_api_key_name(llm_service)
     
@@ -4337,14 +4345,6 @@ server <- function(input, output, session) {
     max_retries                <- as.numeric(llm_settings_model_1$max_retries %||% 0)
     #internal_version           <- internal_version
     
-    
-    if(show_debugging_msg) print(paste0("api_upload: ", api_upload))
-    if(show_debugging_msg) print(paste0("api_chat: ", api_chat))
-    if(show_debugging_msg) print(paste0("deep_pdfscan: ", deep_pdfscan))
-    if(show_debugging_msg) print(paste0("force_parse: ", force_parse))
-    if(show_debugging_msg) print(paste0("user_id: ", user_id))
-    if(show_debugging_msg) print(paste0("max_retries: ", max_retries))
-    
     # Validate API key first
     if (is.null(api_key) || api_key == "") {
       shiny::showNotification(
@@ -4363,6 +4363,7 @@ server <- function(input, output, session) {
     ## Validating and combining single or multiple files
     ready_path <- prepare_uploaded_files(
       files             = input$pdffile_model_1,
+      llm_service       = llm_service,
       single_file_types = llm_accept_single_types,
       multi_file_types  = llm_accept_multi_types
     )
@@ -4622,11 +4623,19 @@ server <- function(input, output, session) {
   ### Model 2 LLM
   output$upload_pdf_model_2 <- renderUI({
     if (input$model_select2 == 'Upload File (AI Translation)') {
+      
+      # Determine accepted file types based on llm choice
+      accept_types <- if (llm_settings_model_2$llm_choices %in% c("PMx Co-Modeler", "EXP")) {
+        llm_accept_single_types  # Dify supports text too
+      } else {
+        llm_accept_multi_types  # default for other providers (PDF or text-equivalent)
+      }
+      
       fluidRow(
         column(width = 12,
                fileInput("pdffile_model_2",
                          label    = llm_pdffile_label,
-                         accept   = llm_accept_single_types,
+                         accept   = accept_types,
                          width    = "100%",
                          multiple = TRUE
                )
@@ -4952,7 +4961,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     current_code     <- NULL
-    llm_service      <- first(llm_settings_model_2$llm_choices)
+    llm_service      <- llm_settings_model_2$llm_choices
     api_key          <- get_api_key(llm_service)
     key_name_env_var <- get_api_key_name(llm_service)
     
@@ -4980,14 +4989,6 @@ server <- function(input, output, session) {
     max_retries                <- as.numeric(llm_settings_model_2$max_retries %||% 0)
     #internal_version           <- internal_version
     
-    
-    if(show_debugging_msg) print(paste0("api_upload: ", api_upload))
-    if(show_debugging_msg) print(paste0("api_chat: ", api_chat))
-    if(show_debugging_msg) print(paste0("deep_pdfscan: ", deep_pdfscan))
-    if(show_debugging_msg) print(paste0("force_parse: ", force_parse))
-    if(show_debugging_msg) print(paste0("user_id: ", user_id))
-    if(show_debugging_msg) print(paste0("max_retries: ", max_retries))
-    
     # Validate API key first
     if (is.null(api_key) || api_key == "") {
       shiny::showNotification(
@@ -5006,6 +5007,7 @@ server <- function(input, output, session) {
     ## Validating and combining single or multiple files
     ready_path <- prepare_uploaded_files(
       files             = input$pdffile_model_2,
+      llm_service       = llm_service,
       single_file_types = llm_accept_single_types,
       multi_file_types  = llm_accept_multi_types
     )
