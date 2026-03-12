@@ -4490,6 +4490,7 @@ server <- function(input, output, session) {
       }
       
       update_editor(current_code$answer)
+      shinyjs::click("generate_model")
       return()
     }
     
@@ -4602,6 +4603,7 @@ server <- function(input, output, session) {
         }
         
         update_editor(current_code$answer)
+        shinyjs::click("generate_model")
         return()
       }
       
@@ -4613,6 +4615,7 @@ server <- function(input, output, session) {
     # ── 5. All retries exhausted without success ───────────────────────────────
     shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
     update_editor(current_code$answer)
+    shinyjs::click("generate_model")
     
   }) # end of observeEvent
   
@@ -5130,6 +5133,7 @@ server <- function(input, output, session) {
       }
       
       update_editor(current_code$answer)
+      shinyjs::click("generate_model2")
       return()
     }
     
@@ -5242,6 +5246,7 @@ server <- function(input, output, session) {
         }
         
         update_editor(current_code$answer)
+        shinyjs::click("generate_model2")
         return()
       }
       
@@ -5253,6 +5258,7 @@ server <- function(input, output, session) {
     # ── 5. All retries exhausted without success ───────────────────────────────
     shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
     update_editor(current_code$answer)
+    shinyjs::click("generate_model2")
     
   }) # end of observeEvent
   
