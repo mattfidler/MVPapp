@@ -4439,7 +4439,7 @@ server <- function(input, output, session) {
     remaining_space <- 1 - base_progress
     if(model_lang != "mrgsolve") {
       max_retries     <- 0
-      shiny::showNotification(paste0("No checks or retries will be performed when translating to ", model_lang, "."), type = "warnings", duration = 10)
+      shiny::showNotification(paste0("No checks or retries will be performed when translating to ", model_lang, "."), type = "warning", duration = 10)
     }
     
     # Always show the initial translation in the editor
@@ -5085,7 +5085,7 @@ server <- function(input, output, session) {
     remaining_space <- 1 - base_progress
     if(model_lang != "mrgsolve") {
       max_retries     <- 0
-      shiny::showNotification(paste0("No checks or retries will be performed when translating to ", model_lang, "."), type = "warnings", duration = 10)
+      shiny::showNotification(paste0("No checks or retries will be performed when translating to ", model_lang, "."), type = "warning", duration = 10)
     }
     
     # Always show the initial translation in the editor
