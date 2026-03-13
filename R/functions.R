@@ -5729,7 +5729,7 @@ safely_incProgress <- function(amount, detail = NULL) {
 #'   this should be the combined output of \code{combine_uploaded_files}.
 #' @param file_name Original filename (used for display in notifications and
 #'   for MIME type detection). If \code{NULL}, derived from \code{ready_path}.
-#' @param service Choice of "PROD" (BI-only), "EXP" (BI-only), "Gemini", "OpenAI",
+#' @param service Choice of "PROD" (BI-only), "EXP" (BI-only), "Gemini", "OpenAI", "AWS Bedrock",
 #'  "Claude", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Apollo" (BI-only), "Azure OpenAI"
 #' @param api_key API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc
 #' @param api_upload API URL for uploading of files (Dify requires a 2-step process)
@@ -5815,9 +5815,9 @@ translate_model_code <- function(ready_path,
   file_path <- ready_path
   file_name <- file_name %||% basename(ready_path)
 
-  is_nonmem_file <- grepl("\\.(txt|mod|ctl)$", file_name, ignore.case = TRUE)
+  is_text_file <- grepl("\\.(txt|mod|ctl|cpp)$", file_name, ignore.case = TRUE)
   
-  if(is_nonmem_file) {
+  if(is_text_file) {
     detected_type <- "text/plain"
     new_path <- paste0(file_path, ".txt")
     file.copy(file_path, new_path)
@@ -6063,7 +6063,7 @@ translate_model_code <- function(ready_path,
 #' @param reuse_context Set to TRUE to re-use same conversation_id or chat_obj, more costly in terms of time and tokens
 #' @param service Choice of "PROD", "EXP", "Gemini", "OpenAI", "Claude", "OpenRouter",
 #'  "OpenAI-Compatible", "DeepSeek", "Apollo", "Azure OpenAI", "AWS Bedrock"
-#' @param api_key API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc
+#' @param api_key API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc (Dify only)
 #' @param api_upload API URL for uploading of files (Dify requires a 2-step process)
 #' @param api_chat API URL for chat messages, required for OpenAI-compatible
 #' @param user_id user id for the request
