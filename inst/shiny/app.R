@@ -6387,23 +6387,14 @@ server <- function(input, output, session) {
     time_max     <- max(times_sorted)
     
     for (id in c('min_nca_obs_time_model_1', 'min_tor_obs_time_model_1')) {
-      if(isolate(pending_session_restore())) {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted)        
-      } else {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted, selected = time_min)        
-      }
+      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                      choices = times_sorted, selected = time_min)        
     }
     
     for (id in c('max_nca_obs_time_model_1', 'max_tor_obs_time_model_1')) {
-      if(isolate(pending_session_restore())) {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted)        
-      } else {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted, selected = time_max)        
-      }
+      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                      choices = times_sorted, selected = time_max)        
+      
     }
   }, label = 'update model_1 time selection')
   
@@ -6710,23 +6701,13 @@ server <- function(input, output, session) {
     time_max     <- max(times_sorted)
     
     for (id in c('min_nca_obs_time_model_2', 'min_tor_obs_time_model_2')) {
-      if(isolate(pending_session_restore())) {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted)        
-      } else {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted, selected = time_min)        
-      }
+      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                      choices = times_sorted, selected = time_min)        
     }
     
     for (id in c('max_nca_obs_time_model_2', 'max_tor_obs_time_model_2')) {
-      if(isolate(pending_session_restore())) {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted)        
-      } else {
-        shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
-                                        choices = times_sorted, selected = time_max)        
-      }
+      shinyWidgets::updatePickerInput(session, inputId = id, label = NULL,
+                                      choices = times_sorted, selected = time_max)        
     }
   }, label = 'update model_2 time selection')
   
