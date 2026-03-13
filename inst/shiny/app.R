@@ -80,8 +80,8 @@ if(!exists("use_bi_styling"))          {use_bi_styling           <- TRUE}
 if(!exists("llm_choices"))             {llm_choices              <- c("Claude", "Gemini", "OpenAI", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Azure OpenAI", "AWS Bedrock")}
 if(!exists("api_upload"))              {api_upload               <- NA_character_}
 if(!exists("api_chat"))                {api_chat                 <- NA_character_}
-if(!exists("user_id"))                 {user_id                  <- "mrgsolve_translator"}
-if(!exists("user_id_retry"))           {user_id_retry            <- "mrgsolve_translator"}
+if(!exists("user_id"))                 {user_id                  <- "MVP_user"}
+if(!exists("user_id_retry"))           {user_id_retry            <- "MVP_user"}
 if(!exists("reuse_context"))           {reuse_context            <- FALSE}
 if(!exists("model_gemini"))            {model_gemini             <- "gemini-3-flash-preview"}
 if(!exists("model_openai"))            {model_openai             <- "gpt-5.4"}
