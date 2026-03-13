@@ -61,7 +61,7 @@ Do not output this step.
 Include blocks in this exact order, no exceptions:
 $PROB, $CMT, $PARAM, $MAIN, $ODE, $OMEGA, $SIGMA, $TABLE, $CAPTURE
 Use @annotated for: $CMT, $PARAM, $OMEGA, $SIGMA
-Annotation format: NAME : value : description. Space rows generously.
+Annotation format: NAME : value : description.
 </block_structure>
 
 <block_rules>
@@ -174,7 +174,7 @@ mrgsolve_refine_short_user_prompt <- "Your task is to correct the code so that i
 #' 
 #-------------------------------------------------------------------------------
 
-nonmem_system_prompt <- "
+nonmem_translation_system_prompt <- "
 You are an expert NONMEM programmer and pharmacometrician with deep knowledge of population PK/PD modeling.
 Return ONLY valid NONMEM control stream code. No explanations, no code fences, no preamble or postamble.
 Your output must be ready to run without modification.
@@ -290,8 +290,8 @@ GENERAL BEST PRACTICES:
 - Covariate effects: center continuous covariates on a reference value (e.g. WT/70)
 "
 
-nonmem_long_user_prompt  <- "Convert the model described in this file into NONMEM code. Your boss is auditing you and you only have one chance."
-nonmem_short_user_prompt <- "Convert the model described in this file into NONMEM code. Your boss is auditing you and you only have one chance."
+nonmem_translation_long_user_prompt  <- "Convert the model described in this file into NONMEM code. Your boss is auditing you and you only have one chance."
+nonmem_translation_short_user_prompt <- "Convert the model described in this file into NONMEM code. Your boss is auditing you and you only have one chance."
 
 #-------------------------------------------------------------------------------
 #' rxode2 / nlmixr2 translation prompts
