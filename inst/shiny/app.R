@@ -4614,7 +4614,11 @@ server <- function(input, output, session) {
     }
     
     # ── 5. All retries exhausted without success ───────────────────────────────
-    shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
+    if(model_lang == "mrgsolve") {
+      shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
+    } else {
+      shiny::showNotification(paste0("No checks are performed for ", model_lang, "."), type = "warning", duration = 10)
+    }
     update_editor(current_code$answer)
     #shinyjs::click("generate_model")
     
@@ -5258,7 +5262,11 @@ server <- function(input, output, session) {
     }
     
     # ── 5. All retries exhausted without success ───────────────────────────────
-    shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
+    if(model_lang == "mrgsolve") {
+      shiny::showNotification(llm_max_retries_error, type = "error", duration = 10)
+    } else {
+      shiny::showNotification(paste0("No checks are performed for ", model_lang, "."), type = "warning", duration = 10)
+    }
     update_editor(current_code$answer)
     #shinyjs::click("generate_model2")
     
