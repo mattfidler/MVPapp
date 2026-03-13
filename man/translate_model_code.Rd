@@ -48,7 +48,7 @@ this should be the combined output of \code{combine_uploaded_files}.}
 \item{file_name}{Original filename (used for display in notifications and
 for MIME type detection). If \code{NULL}, derived from \code{ready_path}.}
 
-\item{service}{Choice of "PROD" (BI-only), "EXP" (BI-only), "Gemini", "OpenAI",
+\item{service}{Choice of "PROD" (BI-only), "EXP" (BI-only), "Gemini", "OpenAI", "AWS Bedrock",
 "Claude", "OpenRouter", "OpenAI-Compatible", "DeepSeek", "Apollo" (BI-only), "Azure OpenAI"}
 
 \item{api_key}{API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc}

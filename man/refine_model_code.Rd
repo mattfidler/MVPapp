@@ -51,7 +51,7 @@ refine_model_code(
 \item{service}{Choice of "PROD", "EXP", "Gemini", "OpenAI", "Claude", "OpenRouter",
 "OpenAI-Compatible", "DeepSeek", "Apollo", "Azure OpenAI", "AWS Bedrock"}
 
-\item{api_key}{API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc}
+\item{api_key}{API Key, recommended to store it as env var called "ANTHROPIC_API_KEY" etc (Dify only)}
 
 \item{api_upload}{API URL for uploading of files (Dify requires a 2-step process)}
 
